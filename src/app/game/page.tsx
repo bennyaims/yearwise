@@ -1,9 +1,9 @@
 import { GameHub } from "@/components/game/GameHub";
 
 export const metadata = {
-  title: "Yearwise Game — learn, earn, build",
+  title: "Build Lab — coding & animation in the curriculum",
   description:
-    "Coins from every subject test, CS builds the game, Blender for 3D, live teacher classes.",
+    "Part of the Australian Y7–12 curriculum: Computer Science coding systems, Blender 3D animation, guided classes, and applied Genesis science projects.",
 };
 
 export default function GamePage() {

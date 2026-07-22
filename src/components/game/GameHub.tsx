@@ -13,6 +13,10 @@ import {
   type LiveClassSession,
 } from "@/lib/live-class";
 
+/**
+ * Curriculum Build Lab hub — coding, animation, and applied practice
+ * that support the Australian Years 7–12 pathways (not a standalone game).
+ */
 export function GameHub() {
   const [eco, setEco] = useState<GameEconomyState | null>(null);
   const [classes, setClasses] = useState<LiveClassSession[]>([]);
@@ -30,7 +34,7 @@ export function GameHub() {
   if (!eco) {
     return (
       <div className="page-shell">
-        <p className="text-muted">Loading game…</p>
+        <p className="text-muted">Loading Build Lab…</p>
       </div>
     );
   }
@@ -38,27 +42,29 @@ export function GameHub() {
   return (
     <div className="page-shell page-mid space-y-6">
       <Link href="/" className="link-back">
-        ← Home
+        ← Curriculum home
       </Link>
 
       <header className="glass-strong rounded-[var(--radius-xl)] p-6 sm:p-8">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
-          Yearwise Game Mode
+          Curriculum · Digital Technologies & applied practice
         </p>
         <h1 className="heading-display mt-2 text-3xl sm:text-4xl">
-          Learn · earn coins · build the world
+          Build Lab
         </h1>
         <p className="mt-3 max-w-2xl text-muted">
-          Pass tests in <strong className="text-ink">any subject</strong> to earn
-          coins. Spend them on food, animals and characters. Computer Science
-          teaches you to <strong className="text-ink">code the game</strong>.
-          Blender teaches <strong className="text-ink">3D worlds</strong>. Start an{" "}
-          <strong className="text-ink">app class</strong> anytime — a voice
-          teacher bot reads and explains every step.
+          Yearwise is a <strong className="text-ink">Years 7–12 curriculum</strong>.
+          This lab is how Computer Science and animation are taught: students{" "}
+          <strong className="text-ink">code working systems</strong> (scores,
+          shops, simulations) and learn{" "}
+          <strong className="text-ink">3D modelling &amp; animation</strong> in
+          Blender — the same skills that power Genesis Lab and class demos. Progress
+          rewards (coins) motivate practice across every subject, then feed applied
+          biology projects.
         </p>
         <div className="mt-5 flex flex-wrap gap-4">
           <div className="rounded-xl bg-[var(--sky-soft)] px-4 py-3">
-            <div className="text-[10px] uppercase text-soft">Coins</div>
+            <div className="text-[10px] uppercase text-soft">Practice coins</div>
             <div className="text-2xl font-bold text-ink">🪙 {eco.coins}</div>
           </div>
           <div className="rounded-xl bg-[var(--glass-soft)] px-4 py-3">
@@ -77,52 +83,53 @@ export function GameHub() {
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <HubCard
           href="/game/live"
-          title="App classes + voice teacher"
-          blurb="Start a timed lesson now. Bot reads & explains."
+          title="Guided classes"
+          blurb="Timed lessons with a teacher-style voice that reads and explains."
           icon="🎙️"
         />
         <HubCard
-          href="/game/shop"
-          title="Coin shop"
-          blurb="Buy food, animals, characters for Genesis."
-          icon="🛒"
-        />
-        <HubCard
           href="/game/code"
-          title="Code the game (CS)"
-          blurb="Build shop, loops, sims — unlock shop tiers."
+          title="Code & systems (CS)"
+          blurb="Curriculum coding: loops, state, shops, sims — build real features."
           icon="💻"
         />
         <HubCard
           href="/game/blender"
-          title="Blender 3D"
-          blurb="YouTube-guided lessons for worlds & characters."
+          title="3D & animation"
+          blurb="Blender track for worlds and characters — Digital Technologies."
           icon="🎨"
         />
         <HubCard
+          href="/game/shop"
+          title="Applied rewards shop"
+          blurb="Spend practice coins on flora, fauna, characters for Genesis projects."
+          icon="🛒"
+        />
+        <HubCard
           href="/labs/genesis"
-          title="Genesis world"
-          blurb="Drop shop purchases into the living world."
+          title="Genesis science lab"
+          blurb="Biology & habitation curriculum — apply what you built."
           icon="🌍"
         />
         <HubCard
           href="/weekly-test"
-          title="Weekly test"
-          blurb="Earn extra coins for the shop."
+          title="Weekly curriculum test"
+          blurb="Assess learning; earn practice coins for applied projects."
           icon="⭐"
         />
       </div>
 
       <section className="glass rounded-[var(--radius-lg)] p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="heading-section text-lg">Open app classes</h2>
+          <h2 className="heading-section text-lg">Open guided classes</h2>
           <Link href="/game/live" className="btn btn-primary text-xs">
             Start a class
           </Link>
         </div>
         {classes.length === 0 ? (
           <p className="mt-2 text-sm text-muted">
-            No open sessions yet. Start one — the voice teacher runs the lesson.
+            No open sessions. Start one from the class catalog — the app teacher
+            voice runs the curriculum script.
           </p>
         ) : (
           <ul className="mt-3 space-y-2">
@@ -136,8 +143,7 @@ export function GameHub() {
                   <div>
                     <span className="font-semibold text-ink">{c.title}</span>
                     <span className="mt-0.5 block text-xs text-muted">
-                      {c.teacherName} (voice bot) · Y{c.yearLevel} ·{" "}
-                      <strong>{c.code}</strong>
+                      {c.teacherName} · Y{c.yearLevel} · {c.code}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -146,7 +152,10 @@ export function GameHub() {
                     >
                       {t.phase === "live" ? "LIVE" : "Soon"} · {t.label}
                     </span>
-                    <Link href={`/game/live?code=${c.code}`} className="btn btn-sky text-xs">
+                    <Link
+                      href={`/game/live?code=${c.code}`}
+                      className="btn btn-sky text-xs"
+                    >
                       Enter
                     </Link>
                   </div>
@@ -157,12 +166,13 @@ export function GameHub() {
         )}
       </section>
 
-      <section className="callout callout-tip text-sm">
-        <strong>How the game works:</strong> Finish any lesson quiz or weekly
-        test → earn coins (+ character unlocks on high scores). CS Game-Build
-        modules raise your shop level. Spend coins → items queue for Genesis.
-        App classes use a teacher-style voice bot (Listen / Explain more) with
-        timed steps: hook → model → practice → exit.
+      <section className="callout callout-info text-sm">
+        <strong className="text-ink">Curriculum first:</strong> core subjects
+        (Maths, Science, English, History, Languages, Music, Chemistry) are the
+        main pathways. Build Lab teaches{" "}
+        <strong className="text-ink">coding and animation</strong> by having
+        students implement and extend educational systems — not by replacing the
+        curriculum with a commercial game.
       </section>
     </div>
   );

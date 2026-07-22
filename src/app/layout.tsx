@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s · Yearwise",
   },
   description:
-    "Maths, Science, Chemistry, English, Languages, unfiltered Australian History and Music for Years 7–12.",
+    "Australian Curriculum Years 7–12: Maths, Science, Chemistry, English, Languages, History, Music, Computer Science coding, and 3D animation — full pathways with applied Build Lab projects.",
 };
 
 export const viewport: Viewport = {

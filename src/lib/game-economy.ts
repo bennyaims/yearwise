@@ -1,9 +1,9 @@
 /**
- * Yearwise Game Economy
- * ─────────────────────
- * All-subject tests → coins + unlock choices.
- * Coins buy food growth, animals, characters for Genesis / the shared world.
- * CS “build the game” modules unlock shop tiers.
+ * Yearwise practice economy (curriculum rewards)
+ * ──────────────────────────────────────────────
+ * All-subject curriculum tests → practice coins + unlock choices.
+ * Coins fund applied Genesis science projects (flora, fauna, characters).
+ * CS coding modules (Digital Technologies) unlock project-shop tiers.
  */
 
 export type ShopItemId =
@@ -380,7 +380,7 @@ export function purchaseItem(itemId: ShopItemId): {
   saveEconomy(state);
   return {
     ok: true,
-    message: `Bought ${item.name} for ${item.cost} coins — ready to drop into Genesis.`,
+    message: `Bought ${item.name} for ${item.cost} practice coins — ready for Genesis science lab.`,
     economy: state,
   };
 }

@@ -153,16 +153,21 @@ function LiveInner() {
   return (
     <div className="page-shell page-mid space-y-6">
       <Link href="/game" className="link-back">
-        ← Game hub
+        ← Build Lab
       </Link>
 
       <header className="glass-strong rounded-[var(--radius-xl)] p-6">
-        <h1 className="heading-display text-3xl">App classes</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+          Curriculum classes · teacher-style delivery
+        </p>
+        <h1 className="heading-display mt-2 text-3xl">Guided classes</h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Classes run <strong className="text-ink">inside the app</strong> with
-          a teacher-style <strong className="text-ink">voice bot</strong> that
-          reads and explains each step. No human teacher needed — start any
-          lesson now.
+          Timed curriculum lessons run{" "}
+          <strong className="text-ink">inside Yearwise</strong> with a
+          teacher-style <strong className="text-ink">voice</strong> that reads
+          and explains each step (I do → We do → You do). Start any subject
+          class now — coding and animation tracks sit alongside Maths, Science,
+          and the rest of the Y7–12 program.
         </p>
       </header>
 
@@ -210,15 +215,16 @@ function LiveInner() {
               </label>
             </div>
             <button type="button" className="btn btn-primary" onClick={startCustom}>
-              ▶ Start with voice teacher
+              ▶ Start guided class
             </button>
             {msg && <p className="text-sm text-muted">{msg}</p>}
           </div>
 
           <section>
-            <h2 className="heading-section text-lg">Lesson catalog</h2>
+            <h2 className="heading-section text-lg">Curriculum catalog</h2>
             <p className="mt-1 text-sm text-muted">
-              Pick a ready lesson — the app runs the timer and voice teacher.
+              Pick a ready lesson — the app runs the timer and teacher-style
+              voice.
             </p>
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {CLASS_CATALOG.map((item) => (
@@ -301,9 +307,9 @@ function LiveInner() {
               <div>
                 <p className="text-xs text-accent font-semibold uppercase tracking-wide">
                   {time?.phase === "live"
-                    ? "● APP CLASS LIVE"
+                    ? "● CLASS LIVE"
                     : time?.phase.toUpperCase()}{" "}
-                  · voice teacher
+                  · curriculum · guided voice
                 </p>
                 <h2 className="heading-section text-xl mt-1">{session.title}</h2>
                 <p className="text-sm text-muted">

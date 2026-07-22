@@ -104,12 +104,12 @@ export default function PatternsPage() {
           <div className="glass-strong space-y-4 rounded-[var(--radius-xl)] p-6">
             <h2 className="heading-section text-xl">Patterns block done</h2>
             <p className="text-muted">
-              Stars and game coins updated. Spend coins on food, animals and
-              characters, or keep studying.
+              Stars and practice coins updated. Practice coins support applied
+              coding and Genesis science projects — or continue the maths pathway.
             </p>
             <div className="flex flex-wrap gap-3">
               <Link href="/game/shop" className="btn btn-primary">
-                Coin shop
+                Project shop
               </Link>
               <Link href="/year/7/math" className="btn btn-sky">
                 Year 7 Maths pathway

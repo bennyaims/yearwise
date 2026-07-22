@@ -187,8 +187,8 @@ export function VoiceTeacher({
       )}
 
       <p className="mt-3 text-xs text-muted">
-        Classes run inside the app. {name} is a teacher-style voice that reads
-        and explains each part — no human teacher needed to start.
+        Curriculum delivery inside Yearwise. {name} is a teacher-style voice
+        that reads and explains each part of the lesson script.
       </p>
     </div>
   );

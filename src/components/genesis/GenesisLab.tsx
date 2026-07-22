@@ -398,19 +398,19 @@ export function GenesisLab() {
           whether) humans should inhabit this world.
         </p>
         <p className="mt-3 text-sm text-soft">
-          🪙 {coins} coins · Shop drops apply here after you buy food, animals or
-          characters in{" "}
+          🪙 {coins} practice coins · Applied project drops (flora, fauna,
+          characters) come from the{" "}
           <a href="/game/shop" className="text-accent underline">
-            Game shop
-          </a>
-          .
+            Build Lab project shop
+          </a>{" "}
+          after curriculum tests and CS coding levels.
         </p>
       </header>
 
       {shopNotes.length > 0 && (
         <div className="callout callout-tip">
           <p className="font-semibold text-ink">
-            Game shop applied to this world
+            Project shop applied to this world
           </p>
           <ul className="mt-2 list-inside list-disc text-sm text-muted">
             {shopNotes.map((n) => (
@@ -428,7 +428,9 @@ export function GenesisLab() {
             const { items } = consumePendingInjects();
             setCoins(loadEconomy().coins);
             if (items.length === 0) {
-              setShopNotes(["No pending shop items — buy in the Game shop first."]);
+              setShopNotes([
+                "No pending items — earn practice coins from tests, then buy in the project shop.",
+              ]);
               return;
             }
             setSim((s) => {
@@ -438,10 +440,10 @@ export function GenesisLab() {
             });
           }}
         >
-          Apply pending shop drops
+          Apply pending project drops
         </button>
         <a href="/game" className="btn btn-ghost text-xs">
-          Open Game hub
+          Open Build Lab
         </a>
       </div>
 

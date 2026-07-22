@@ -27,40 +27,43 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
-              Play while you learn: tests in every subject earn{" "}
-              <strong className="text-ink">coins</strong> for food, animals and
-              characters. Computer Science teaches you to{" "}
-              <strong className="text-ink">code the game</strong>; Blender
-              teaches 3D worlds. Join timed live classes with your teacher —
-              plus full Y7–12 pathways in Maths, Science, languages and more.
+              Full Australian secondary{" "}
+              <strong className="text-ink">curriculum</strong> — Maths, Science,
+              Chemistry, English, History, Music, languages, and Computer
+              Science. Timed study blocks, guided lessons, and weekly tests.
+              Within Digital Technologies, students{" "}
+              <strong className="text-ink">learn coding and 3D animation</strong>{" "}
+              by building real educational systems (scores, simulations, Blender
+              assets) that support Genesis science projects — applied practice,
+              not a separate entertainment product.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Link href="/game" className="btn btn-primary">
-                Game Mode · coins, shop, live class
-              </Link>
-              <Link href="/year/7/math" className="btn btn-sky">
-                Year 7 Maths (integers pathway)
+              <Link href="/year/7/math" className="btn btn-primary">
+                Year 7 Maths pathway
               </Link>
               <Link href="/year/7/computerscience" className="btn btn-sky">
-                Computer Science (code → AI)
+                Computer Science (coding → AI)
+              </Link>
+              <Link href="/game" className="btn btn-sky">
+                Build Lab · code &amp; animation
               </Link>
               <Link href="/labs/genesis" className="btn btn-ghost">
-                Genesis Lab (DNA → 3D life)
-              </Link>
-              <Link href="/game/code" className="btn btn-ghost">
-                Code the game (CS levels)
+                Genesis Lab (biology · habitation)
               </Link>
               <Link href="/game/blender" className="btn btn-ghost">
-                Blender 3D lessons
+                Blender 3D &amp; animation
               </Link>
-              <Link href="/patterns" className="btn btn-sky">
+              <Link href="/game/live" className="btn btn-ghost">
+                Guided classes (voice teacher)
+              </Link>
+              <Link href="/patterns" className="btn btn-ghost">
                 Daily patterns drill
               </Link>
               <Link href="/weekly-test" className="btn btn-ghost">
                 Weekly test
               </Link>
               <Link href="/rewards" className="btn btn-ghost">
-                Rewards
+                Progress &amp; badges
               </Link>
             </div>
           </div>

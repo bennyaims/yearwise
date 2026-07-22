@@ -102,11 +102,11 @@ export function CompletionPanel({
         </Link>
         {(reward?.coinsGained ?? 0) > 0 && (
           <Link href="/game/shop" className="btn btn-sky">
-            Spend {reward?.coinsGained} coins in shop →
+            Spend {reward?.coinsGained} practice coins →
           </Link>
         )}
         <Link href="/game" className="btn btn-ghost">
-          Game hub
+          Build Lab (code &amp; animation)
         </Link>
       </div>
 

@@ -96,11 +96,11 @@ export const CLASS_CATALOG: ClassCatalogItem[] = [
   },
   {
     id: "cat-y8-cs",
-    title: "Y8 CS · Build the game (Level 1)",
+    title: "Y8 CS · Code educational systems (Level 1)",
     subject: "game-build",
     yearLevel: 8,
     durationMin: 35,
-    blurb: "Loops, coins, and planting food in the game you play.",
+    blurb: "Loops, practice coins, and food-plot logic — curriculum coding.",
     icon: "💻",
   },
   {
@@ -526,7 +526,7 @@ export function buildLessonScript(
           title: "Learning intention (2 min)",
           minutes: 2,
           script: `Year ${year}: you are a builder of Yearwise — coins, shops, and world injects — not only a player.`,
-          voiceScript: `Welcome to Computer Science Year ${year}. I'm your app teacher. Today you are not only a player — you are a builder of Yearwise. We will talk about variables for coins, loops for planting, and if statements that stop you when money runs out. Passing the build quiz unlocks higher shop levels.`,
+          voiceScript: `Welcome to Computer Science Year ${year}. I'm your curriculum voice teacher. Yearwise is a full school program. Today you learn coding by building educational systems inside it: variables for practice coins, loops for planting food plots, and if statements that stop when coins run out. Passing the systems quiz unlocks higher project-shop tiers for Genesis science.`,
           explainMore:
             "A variable is a named box that holds a value, like coins equals one hundred. A loop repeats steps. An if statement chooses a path based on a condition.",
         },
@@ -554,11 +554,11 @@ export function buildLessonScript(
           title: "You do — Game Build quiz (12 min)",
           minutes: 12,
           script:
-            "Open Code the game, complete the level quiz at 60%+ to raise CS shop level. Coins still granted for any score.",
+            "Open Code & systems, complete the level quiz at 60%+ to raise CS project tier. Practice coins still granted for any score.",
           voiceScript:
-            "Your turn. Open Code the game in the Game hub. Pick a level, read the lesson, then take the quiz. Score sixty percent or higher to unlock that shop tier. You still earn coins for trying. When you finish, buy something small for Genesis — a food plot or herbivore pack.",
+            "Your turn. Open Build Lab, then Code and systems. Pick a level, read the curriculum lesson, then take the quiz. Score sixty percent or higher to unlock that project tier. You still earn practice coins for trying. When you finish, apply something small in Genesis science — a food plot or herbivore pack.",
           explainMore:
-            "Shop tiers protect balance: early levels unlock gentle food and herbivores; higher levels unlock predators and tech so you understand systems first.",
+            "Project tiers match Digital Technologies progression: early levels unlock gentle food and herbivores; higher levels unlock predators and tech once systems thinking is solid.",
         },
         {
           title: "Plenary (5 min)",
@@ -566,7 +566,7 @@ export function buildLessonScript(
           script:
             "Name one bug you almost made (off-by-one, wrong cost). Celebrate unlocks.",
           voiceScript:
-            "Let's close. Name one mistake that is easy in code: counting one too many, or forgetting to check coins before buying. Great programmers catch those early. You built a piece of the game today. See you in the next level.",
+            "Let's close. Name one mistake that is easy in code: counting one too many, or forgetting to check coins before buying. Great programmers catch those early. You built a curriculum system today. See you in the next level.",
         },
       ],
     };
@@ -592,7 +592,7 @@ export function buildLessonScript(
           script:
             "Open the Blender track. Play the YouTube lesson. Pause every two minutes and match the step.",
           voiceScript:
-            "Open the Blender track in Game Mode. Press play on the curated YouTube lesson. Pause every two minutes. Match the step on your machine: orbit the view, add a mesh, rename it. If you get lost, rewind thirty seconds. Learning 3D is muscle memory plus patience.",
+            "Open the Blender track in Build Lab. Press play on the curated YouTube lesson. Pause every two minutes. Match the step on your machine: orbit the view, add a mesh, rename it. If you get lost, rewind thirty seconds. Learning 3D animation is curriculum practice — muscle memory plus patience.",
           explainMore:
             "Common shortcuts: middle mouse to orbit, shift middle to pan, scroll to zoom. On a trackpad, use the emulated three-button mouse settings if needed.",
         },
@@ -652,9 +652,9 @@ export function buildLessonScript(
           title: "You do + quiz (8 min)",
           minutes: 8,
           script:
-            "Patterns drill or lesson quiz. Coins fund the game shop.",
+            "Patterns drill or lesson quiz. Practice coins fund applied projects.",
           voiceScript:
-            "Your turn. Open the daily patterns drill or your maths lesson quiz. Work carefully. Coins from tests go to the game shop for food and animals. Mistakes are data — fix one, then try again.",
+            "Your turn. Open the daily patterns drill or your maths lesson quiz. Work carefully. Practice coins from curriculum tests support Genesis science projects. Mistakes are data — fix one, then try again.",
         },
         {
           title: "Exit ticket (4 min)",
@@ -752,7 +752,7 @@ export function buildLessonScript(
           script:
             "Build one PEEL paragraph together on a shared topic (game world or text).",
           voiceScript:
-            "We do. Together we build one PEEL paragraph. You may use the game world as your text: technology, pollution, or forest harvest. Say your point in one sentence. Add one evidence line. Explain it. Link it.",
+            "We do. Together we build one PEEL paragraph. You may use the Genesis science world as your text: technology, pollution, or forest harvest. Say your point in one sentence. Add one evidence line. Explain it. Link it.",
         },
         {
           title: "You do (8 min)",
@@ -805,7 +805,7 @@ export function buildLessonScript(
           minutes: 8,
           script: "History lesson quiz or short source note. Coins to shop.",
           voiceScript:
-            "Your turn. Complete a history lesson or quiz. Write two lines: one fact and one uncertainty. Earn coins for the game shop.",
+            "Your turn. Complete a history lesson or quiz. Write two lines: one fact and one uncertainty. Earn practice coins for applied projects.",
         },
         {
           title: "Exit (3 min)",
@@ -858,9 +858,9 @@ export function buildLessonScript(
         title: "You do + quiz (8 min)",
         minutes: 8,
         script:
-          "Independent practice, then a quiz. Coins go to the game shop for food, animals, and characters.",
+          "Independent practice, then a quiz. Practice coins support Genesis science projects.",
         voiceScript:
-          "Your turn. Practise independently, then take a quiz in this subject. Coins from tests fund the game shop — food, animals, and characters for Genesis. Aim for understanding, not rushing.",
+          "Your turn. Practise independently, then take a quiz in this subject. Practice coins from curriculum tests support food, animals, and characters in Genesis Lab. Aim for understanding, not rushing.",
       },
       {
         title: "Exit ticket (4 min)",
@@ -889,7 +889,7 @@ export function ensureDemoClassesFromNow(): LiveClassSession[] {
     startAppClass({
       subject: "game-build",
       yearLevel: 8,
-      title: "Y8 CS · Build the game Level 1 (app class)",
+      title: "Y8 CS · Code educational systems Level 1",
       durationMin: 35,
     }),
     startAppClass({

@@ -17,15 +17,19 @@ export default function BlenderTrackPage() {
   return (
     <div className="page-shell page-mid space-y-6">
       <Link href="/game" className="link-back">
-        ← Game hub
+        ← Build Lab
       </Link>
 
       <header className="glass-strong rounded-[var(--radius-xl)] p-6">
-        <h1 className="heading-display text-3xl">Blender 3D track</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+          Digital Technologies · 3D &amp; animation curriculum
+        </p>
+        <h1 className="heading-display mt-2 text-3xl">Blender 3D &amp; animation</h1>
         <p className="mt-2 max-w-2xl text-muted">
-          Learn world and character building with free Blender + curated YouTube
-          lessons. Teacher scripts use pause-and-practice. Skills feed Genesis
-          worlds and CS asset pipelines.
+          Curriculum track for modelling and animation with free Blender and
+          curated YouTube lessons. Teacher-style pause-and-practice. Skills
+          support Genesis science worlds and the CS asset pipeline — animation
+          taught as part of the learning program, not as a side game.
         </p>
         <a
           href="https://www.blender.org/download/"

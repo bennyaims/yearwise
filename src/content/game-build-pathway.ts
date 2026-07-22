@@ -1,6 +1,7 @@
 /**
- * Computer Science: Build the Yearwise Game (Y7–Y12)
- * Students learn to code the game they play — each level unlocks shop tiers.
+ * Computer Science curriculum: code educational systems (Y7–Y12).
+ * Students learn programming by building Yearwise features (scores, shops,
+ * sims). Applied project tiers unlock as Digital Technologies outcomes.
  */
 
 import type { ContentBlock, QuizQuestion, YearLevel } from "@/lib/types";
@@ -14,7 +15,7 @@ export type GameBuildModule = {
   minutes: number;
   content: ContentBlock[];
   quiz: QuizQuestion[];
-  /** What this unlocks in the game economy */
+  /** What this unlocks in applied project tools */
   unlocks: string;
 };
 
@@ -24,17 +25,17 @@ export const GAME_BUILD_MODULES: GameBuildModule[] = [
     year: 7,
     level: 1,
     title: "Level 1 · Loops that grow food",
-    summary: "Use loops to place food plots and count coins.",
+    summary: "Use loops to place food plots and count practice coins.",
     minutes: 30,
-    unlocks: "Shop: food plots, herbivores, forest pack",
+    unlocks: "Project shop: food plots, herbivores, forest pack",
     content: [
       {
         type: "heading",
-        text: "You are not only a player — you are a builder",
+        text: "Curriculum coding: build systems that teach",
       },
       {
         type: "paragraph",
-        text: "In Yearwise Game Mode, Computer Science lessons teach you to build systems the game uses: coin counters, item shops, and world injects (extra plants and animals).",
+        text: "Yearwise is a full subject curriculum. In Computer Science you learn by building the educational systems the app uses: progress counters, project shops, and world injects for Genesis science (extra plants and animals). Coding is the lesson — the systems are practice projects.",
       },
       {
         type: "example",
@@ -44,7 +45,7 @@ export const GAME_BUILD_MODULES: GameBuildModule[] = [
       {
         type: "callout",
         tone: "tip",
-        text: "Teacher approach: I do (demo loop) → We do (trace coins) → You do (quiz). Earn coins in any subject; spend them on the world.",
+        text: "Teacher approach: I do (demo loop) → We do (trace coins) → You do (quiz). Practice coins from any subject test feed applied Genesis projects.",
       },
       {
         type: "list",

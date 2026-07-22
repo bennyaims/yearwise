@@ -31,14 +31,19 @@ export default function ShopPage() {
   return (
     <div className="page-shell page-mid space-y-6">
       <Link href="/game" className="link-back">
-        ← Game hub
+        ← Build Lab
       </Link>
       <header className="glass-strong rounded-[var(--radius-xl)] p-6">
-        <h1 className="heading-display text-3xl">Coin shop</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+          Applied project rewards
+        </p>
+        <h1 className="heading-display mt-2 text-3xl">Project shop</h1>
         <p className="mt-2 text-muted">
-          Spend coins from <strong className="text-ink">all subject tests</strong>.
-          CS Game-Build level {eco.csBuildLevel}/6 unlocks higher tiers. Items
-          queue for Genesis Lab.
+          Practice coins come from{" "}
+          <strong className="text-ink">curriculum tests in every subject</strong>
+          . CS systems level {eco.csBuildLevel}/6 (coding pathway) unlocks higher
+          tiers. Purchases support Genesis science projects — food webs, fauna,
+          and characters you design while learning.
         </p>
         <p className="mt-3 text-2xl font-bold text-accent">🪙 {eco.coins}</p>
         {eco.unlockedCharacters.length > 0 && (
@@ -100,7 +105,7 @@ export default function ShopPage() {
         <Link href="/labs/genesis" className="text-accent underline">
           Genesis Lab
         </Link>{" "}
-        to apply pending world drops.
+        (biology &amp; habitation curriculum) to apply pending project drops.
       </p>
     </div>
   );

@@ -36,14 +36,24 @@ export default function AboutPage() {
             ))}
           </ul>
           <h2 className="heading-section text-xl text-ink">
-            Computer Science & AI
+            Computer Science, coding &amp; animation
           </h2>
           <p>
-            From Year 7 computational thinking through Year 12, students learn
-            to write code that builds machine-learning systems — and to design
-            technical and civic defences against AI misuse and domination
-            (human-in-the-loop, least privilege, interruptibility, regulation,
-            transparency). Exit gate: build + defend.
+            Yearwise is a <strong className="text-ink">curriculum</strong>, not
+            a commercial game. From Year 7 computational thinking through Year
+            12, students learn to write code that builds machine-learning
+            systems — and to design technical and civic defences against AI
+            misuse (human-in-the-loop, least privilege, interruptibility,
+            regulation, transparency). Exit gate: build + defend.
+          </p>
+          <p>
+            The <strong className="text-ink">Build Lab</strong> is how coding
+            and 3D animation are taught inside that curriculum: students
+            implement educational systems (progress, shops, simulations) and
+            learn Blender for world and character assets that support Genesis
+            science projects. Practice coins from subject tests reward effort
+            and feed those applied projects — the game-like layer is a teaching
+            method, not the product identity.
           </p>
           <h2 className="heading-section text-xl text-ink">
             Unfiltered history

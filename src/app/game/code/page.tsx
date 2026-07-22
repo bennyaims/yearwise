@@ -39,8 +39,8 @@ export default function GameCodePage() {
     setRewardMsg(
       r.message +
         (percent >= 60
-          ? ` · CS Game-Build level → at least ${active.level}`
-          : " · Score 60%+ to unlock this shop tier"),
+          ? ` · CS systems level → at least ${active.level}`
+          : " · Score 60%+ to unlock the next applied-project tier"),
     );
   }
 
@@ -49,17 +49,24 @@ export default function GameCodePage() {
   return (
     <div className="page-shell page-mid space-y-6">
       <Link href="/game" className="link-back">
-        ← Game hub
+        ← Build Lab
       </Link>
 
       <header className="glass-strong rounded-[var(--radius-xl)] p-6">
-        <h1 className="heading-display text-3xl">Code the game</h1>
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+          Computer Science curriculum · applied coding
+        </p>
+        <h1 className="heading-display mt-2 text-3xl">Code &amp; systems</h1>
         <p className="mt-2 text-muted">
-          Computer Science path: you build the systems behind Yearwise — coins,
-          shops, simulations, live rooms. Each level unlocks more shop items.
+          You learn programming by building the educational systems Yearwise
+          uses: progress counters, shops, simulations, and class rooms. This is
+          curriculum coding — not a separate entertainment product. Each level
+          deepens Digital Technologies skills and unlocks applied project tools
+          for Genesis Lab.
         </p>
         <p className="mt-3 text-sm">
-          🪙 {eco.coins} · CS build level <strong>{eco.csBuildLevel}/6</strong>
+          🪙 {eco.coins} practice coins · CS systems level{" "}
+          <strong>{eco.csBuildLevel}/6</strong>
         </p>
       </header>
 
