@@ -1,47 +1,58 @@
-# Yearwise — LAUNCHED for student testing
+# Yearwise — LIVE for student testing
 
-## Give this to your daughter
+**Status (2026-07-22): LAUNCHED** via public tunnel + home network.  
+Full curriculum build is on **localhost / Cloudflare / LAN**.  
+Vercel production uploads are currently blocked by account/Git settings (see Parent notes).
 
-### Open the site
+---
+
+## Give this to your daughter ✂️
+
+### Website
 **https://instantly-merchant-gently-gates.trycloudflare.com**
 
-(Or on home Wi‑Fi: **http://192.168.2.24:3000**)
+Same Wi‑Fi as Dad’s Mac: **http://192.168.2.24:3000**
 
 ### Sign in (no password)
-1. Go to: **…/signup**
-2. Enter **her name**
-3. Pick **Year 7** (or her year)
-4. Email optional — leave blank
-5. **Password: none**
-6. Tap through software pack (or “finish downloads later”)
-7. **Start curriculum**
+| | |
+|--|--|
+| **URL** | …/signup |
+| **Name** | Her first name |
+| **Year** | Year 7 (or her year) |
+| **Email** | optional / blank |
+| **Password** | **none — not needed** |
 
-### First things to try
-| What | URL path |
-|------|----------|
+1. Open the website  
+2. Complete **Sign up** (software downloads optional → “finish later”)  
+3. Start learning  
+
+### Try these first
+| Activity | Path |
+|----------|------|
 | Year 7 home | `/year/7` |
 | Maths integers | `/year/7/math/integers-and-number-line` |
-| Times tables | `/times-tables` |
+| Times tables gym | `/times-tables` |
 | GeoGebra designs | `/game/geogebra` |
-| Science cells | `/year/7/science/cells-as-units` |
-| CS pathways | `/year/7/computerscience` |
+| Science cells (guided) | `/year/7/science/cells-as-units` |
+| CS pathway pick | `/year/7/computerscience` |
 | Build Lab | `/game` |
 | Genesis Lab | `/labs/genesis` |
 
 ### Rules
-- Finish each **lesson quiz** to unlock the next (no skip)
-- Year exams include **earlier years** + **times tables**
-- Need **92% overall** across subjects + year exam to unlock next year
+- **No skipping** — finish each lesson **quiz** to unlock the next  
+- Year exams include **previous years** + **times tables** (memory)  
+- Need **92% overall** + year exam **92%** to unlock next year  
 
-### Parent notes
-- Progress saves **in her browser** on that device
-- Keep this Mac **on and awake** while using the Cloudflare URL (tunnel)
-- GitHub: https://github.com/bennyaims/yearwise
-- Vercel project: `bennyaims-projects/yearwise`  
-  Production alias target: https://yearwise-red.vercel.app  
-  (If Vercel shows login/SSO, use the Cloudflare URL above — public, full build)
+---
 
-### Demo video
-```
-open test-screenshots/student-tour/yearwise-student-tour.mp4
-```
+## Parent notes
+- Keep this Mac **awake**; tunnel dies if the machine sleeps  
+- Progress is **per browser / device** (localStorage)  
+- Code: https://github.com/bennyaims/yearwise  
+- Demo video: `test-screenshots/student-tour/yearwise-student-tour.mp4`  
+- **Vercel:** project `bennyaims-projects/yearwise` — recent deploys **BLOCKED** because Git author must match a Vercel team member (`TEAM_ACCESS_REQUIRED`). SSO protection was turned **off**. To fix permanent `yearwise-red.vercel.app`:  
+  1. Vercel dashboard → connect GitHub account to the team, **or**  
+  2. Run one clean `npx vercel deploy --prebuilt --prod` with no other deploys running  
+
+### What’s included in this build
+Y7–12 curriculum, guided lessons, quizzes, 92% progression, year exams (cumulative), CS pathways, GeoGebra design studio, times tables + mental strategies, software signup pack, Build Lab, Genesis Lab, voice teacher classes.
