@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AmbientBackground } from "@/components/AmbientBackground";
 import { Header } from "@/components/Header";
+import { OnboardingGate } from "@/components/OnboardingGate";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -46,7 +47,9 @@ export default function RootLayout({
       <body className="ambient-root flex min-h-full flex-col font-sans">
         <AmbientBackground />
         <Header />
-        <main className="relative flex-1">{children}</main>
+        <main className="relative flex-1">
+          <OnboardingGate>{children}</OnboardingGate>
+        </main>
         <footer className="site-footer">
           <p className="text-ink font-medium opacity-80">
             Yearwise · Australian secondary learning · Years 7–12

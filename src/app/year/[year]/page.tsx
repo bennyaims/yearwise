@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { SubjectCard } from "@/components/SubjectCard";
+import { YearGate } from "@/components/YearGate";
 import { YearProgress } from "@/components/YearProgress";
 import { getLessonsFor } from "@/content/lessons";
 import { subjectsForYear, YEARS } from "@/lib/subjects";
@@ -41,8 +42,10 @@ export default async function YearPage({ params }: Props) {
           Year {year}
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted sm:text-base">
-          Select a subject. Languages open a pathway picker so you can stick
-          with Spanish, Russian, Chinese, German, Japanese, Khmer or Italian.
+          Select a subject. Finish every lesson quiz in order — no skipping.
+          You may sit the Year exam early; unlocking the next year needs{" "}
+          <strong className="text-ink">92% overall</strong> across all subjects
+          plus 92% on the year exam. Languages: pick one pathway Y7–Y12.
         </p>
       </div>
 
@@ -50,6 +53,7 @@ export default async function YearPage({ params }: Props) {
         <YearProgress year={year} />
       </div>
 
+      <YearGate year={year}>
       <div className="mb-6 flex flex-wrap gap-2">
         {YEARS.map((y) => (
           <Link
@@ -88,6 +92,7 @@ export default async function YearPage({ params }: Props) {
           );
         })}
       </div>
+      </YearGate>
     </div>
   );
 }

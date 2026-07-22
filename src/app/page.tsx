@@ -31,16 +31,26 @@ export default function HomePage() {
               <strong className="text-ink">curriculum</strong> (Years 7–12) —
               Maths, Science, Chemistry, English, History, Music, languages, and
               Computer Science. In-depth lessons with{" "}
-              <strong className="text-ink">YouTube support videos</strong> woven
-              in, guided teaching checks, and{" "}
-              <strong className="text-ink">self-paced Fast track</strong> so
-              strong students can prove mastery and move ahead. Build Lab teaches{" "}
+              <strong className="text-ink">YouTube support videos</strong> and
+              guided checks. <strong className="text-ink">No skipping</strong> —
+              finish every quiz in order. Sit the Year exam early if you want,
+              but you need <strong className="text-ink">92% overall</strong>{" "}
+              across all subjects (and 92% on the year exam) to progress years.
+              Build Lab teaches{" "}
               <strong className="text-ink">coding and 3D animation</strong> as
-              curriculum Digital Technologies — applied systems for Genesis
-              science, not a separate entertainment product.
+              curriculum Digital Technologies.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-              <Link href="/year/7/math" className="btn btn-primary">
+              <Link href="/signup" className="btn btn-primary">
+                Sign up · software downloads
+              </Link>
+              <Link href="/tools" className="btn btn-sky">
+                Tools (GeoGebra, Blender…)
+              </Link>
+              <Link href="/game/geogebra" className="btn btn-sky">
+                GeoGebra design studio (fun maths)
+              </Link>
+              <Link href="/year/7/math" className="btn btn-sky">
                 Year 7 Maths pathway
               </Link>
               <Link href="/year/7/computerscience" className="btn btn-sky">

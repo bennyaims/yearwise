@@ -1,9 +1,15 @@
-import type { ContentBlock, Lesson, QuizQuestion, YearLevel } from "@/lib/types";
+import type {
+  ContentBlock,
+  CsPathwayId,
+  Lesson,
+  QuizQuestion,
+  YearLevel,
+} from "@/lib/types";
 
 /**
- * Computer Science Y7–Y12 pathway.
- * End goal: student can write code that builds AI systems,
- * and can reason about defending humanity against catastrophic AI misuse / dominance.
+ * Computer Science Y7–Y12 content bank.
+ * Students choose a pathway each year (Software, AI & Data, Cyber, Creative).
+ * Lessons tagged with csPathways; empty/omit = core for all pathways.
  */
 
 type Block = {
@@ -13,6 +19,8 @@ type Block = {
   summary: string;
   strand: string;
   minutes: number;
+  /** Empty / omit = available on every pathway */
+  csPathways?: CsPathwayId[];
   content: ContentBlock[];
   quiz: QuizQuestion[];
 };
@@ -1212,16 +1220,73 @@ const BLOCKS: Block[] = [
   },
 ];
 
+/**
+ * Pathway tags per lesson id.
+ * Empty array = core (every pathway).
+ * Listed pathways = elective modules for those tracks only.
+ */
+const PATHWAY_TAGS: Record<string, CsPathwayId[]> = {
+  // Y7
+  "cs-y7-thinking": [],
+  "cs-y7-binary-data": [],
+  "cs-y7-first-code": ["software", "creative"],
+  "cs-y7-check": [],
+  // Y8
+  "cs-y8-selection": ["software", "creative", "cyber"],
+  "cs-y8-loops": ["software", "creative", "ai-data"],
+  "cs-y8-functions": ["software"],
+  "cs-y8-lists": ["ai-data", "software"],
+  // Y9
+  "cs-y9-oop": ["software", "creative"],
+  "cs-y9-algorithms-search": ["software", "ai-data"],
+  "cs-y9-networks": ["cyber"],
+  "cs-y9-security-basics": ["cyber"],
+  // Y10
+  "cs-y10-python-projects": ["software", "creative", "ai-data"],
+  "cs-y10-ml-intro": ["ai-data"],
+  "cs-y10-features-labels": ["ai-data"],
+  "cs-y10-ethics-bias": [],
+  // Y11
+  "cs-y11-linear-model": ["ai-data", "software"],
+  "cs-y11-neural-nets": ["ai-data"],
+  "cs-y11-train-eval": ["ai-data"],
+  "cs-y11-llm-basics": ["ai-data", "creative", "software"],
+  // Y12
+  "cs-y12-build-ai-system": [],
+  "cs-y12-alignment-control": ["ai-data", "cyber"],
+  "cs-y12-defend-dominance": [],
+  "cs-y12-adversarial-defence": ["cyber", "ai-data"],
+  "cs-y12-exit": [],
+};
+
+export function lessonOnCsPathway(
+  lesson: { id: string; csPathways?: CsPathwayId[] },
+  pathway: CsPathwayId,
+): boolean {
+  const tags = lesson.csPathways ?? PATHWAY_TAGS[lesson.id];
+  if (!tags || tags.length === 0) return true; // core
+  return tags.includes(pathway);
+}
+
 export function buildComputerScienceLessons(): Lesson[] {
-  return BLOCKS.map((b) => ({
-    id: b.id,
-    title: b.title,
-    summary: b.summary,
-    estimatedMinutes: b.minutes,
-    year: b.year,
-    subject: "computerscience" as const,
-    strand: b.strand,
-    content: b.content,
-    quiz: b.quiz,
-  }));
+  return BLOCKS.map((b) => {
+    const tags = b.csPathways ?? PATHWAY_TAGS[b.id] ?? [];
+    return {
+      id: b.id,
+      title: b.title,
+      summary: b.summary,
+      estimatedMinutes: b.minutes,
+      year: b.year,
+      subject: "computerscience" as const,
+      strand: b.strand,
+      csPathways: tags.length > 0 ? tags : undefined,
+      content: b.content,
+      quiz: b.quiz,
+    };
+  });
+}
+
+/** Verify ids used in PATHWAY_TAGS exist — soft check at module load in dev */
+export function listCsLessonIds(): string[] {
+  return BLOCKS.map((b) => b.id);
 }

@@ -18,9 +18,13 @@ export function saveProgress(map: ProgressMap): void {
   localStorage.setItem(KEY, JSON.stringify(map));
 }
 
+/**
+ * Mark lesson complete — quiz score is required (no skip).
+ * Call only after the student finishes the lesson quiz.
+ */
 export function markLessonComplete(
   lessonKey: string,
-  quizScore?: number,
+  quizScore: number,
 ): ProgressMap {
   const map = loadProgress();
   map[lessonKey] = {

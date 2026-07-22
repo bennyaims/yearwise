@@ -23,6 +23,12 @@ export function Header() {
         </Link>
         <nav className="flex shrink-0 items-center gap-0.5 text-sm sm:gap-1">
           <Link
+            href="/tools"
+            className="btn btn-chip btn-ghost !min-h-9 !px-2 text-muted hover:text-ink sm:!px-3"
+          >
+            Tools
+          </Link>
+          <Link
             href="/game"
             className="btn btn-chip btn-ghost !min-h-9 !px-2 text-muted hover:text-ink sm:!px-3"
           >
@@ -53,10 +59,10 @@ export function Header() {
             Rewards
           </Link>
           <Link
-            href="/about"
+            href="/signup?edit=1"
             className="btn btn-chip btn-ghost !min-h-9 !px-2 text-muted hover:text-ink sm:!px-3"
           >
-            About
+            Profile
           </Link>
         </nav>
       </div>

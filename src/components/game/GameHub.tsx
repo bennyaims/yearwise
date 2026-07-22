@@ -88,6 +88,12 @@ export function GameHub() {
           icon="🎙️"
         />
         <HubCard
+          href="/game/geogebra"
+          title="GeoGebra design studio"
+          blurb="Fun maths art: star bursts → galaxies. Beginner to expert."
+          icon="✨"
+        />
+        <HubCard
           href="/game/code"
           title="Code & systems (CS)"
           blurb="Curriculum coding: loops, state, shops, sims — build real features."

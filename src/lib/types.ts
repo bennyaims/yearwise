@@ -138,6 +138,9 @@ export type LearnBeat = {
   };
 };
 
+/** Computer Science elective pathway (chosen each year) */
+export type CsPathwayId = "software" | "ai-data" | "cyber" | "creative";
+
 export type Lesson = {
   id: string;
   title: string;
@@ -146,6 +149,11 @@ export type Lesson = {
   year: YearLevel;
   subject: SubjectId;
   language?: LanguageId;
+  /**
+   * CS only: which pathways include this lesson.
+   * Omit or empty = core (all pathways).
+   */
+  csPathways?: CsPathwayId[];
   strand?: string;
   content: ContentBlock[];
   /**

@@ -118,8 +118,8 @@ export function CompletionPanel({
       )}
       {nextLesson && (
         <p className="text-sm text-muted">
-          High quiz scores keep Fast track available so you can progress
-          quicker when you already know the material.
+          Next lesson unlocks only after this quiz is finished. Year progress
+          needs every subject quiz done and 92% overall — no skipping.
         </p>
       )}
     </div>

@@ -8,7 +8,7 @@ export const SUBJECTS: SubjectMeta[] = [
     name: "Mathematics",
     shortName: "Maths",
     description:
-      "Number, algebra, measurement, geometry, statistics and probability — mapped to Australian Curriculum (v9) and senior pathways.",
+      "Number, algebra, measurement, geometry, statistics and probability — made visual and fun with GeoGebra design projects (beginner star-bursts through expert galaxies), mapped to Australian Curriculum (v9) and senior pathways.",
     color: "#5b8fd4",
     icon: "∑",
     years: [7, 8, 9, 10, 11, 12],
@@ -78,7 +78,7 @@ export const SUBJECTS: SubjectMeta[] = [
     name: "Computer Science",
     shortName: "CS",
     description:
-      "Coding Y7–Y12 through building AI systems. Exit: write code that creates AI, and design defences against AI misuse and domination.",
+      "Each year choose a pathway: Software & App Coding, Data Science & AI, Cybersecurity & Systems, or Creative Computing & Worlds. Core lessons are shared; electives follow your track. Senior exit still covers build + defend AI.",
     color: "#5b9fd4",
     icon: "💻",
     years: [7, 8, 9, 10, 11, 12],

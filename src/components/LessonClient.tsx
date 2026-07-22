@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { AudioPhrases } from "@/components/AudioPhrases";
 import { CompletionPanel } from "@/components/CompletionPanel";
 import { ContentBlocks } from "@/components/ContentBlocks";
 import { GuidedLearning } from "@/components/GuidedLearning";
+import { CsPathwayBadge } from "@/components/CsPathwayPicker";
+import { LessonSoftware } from "@/components/LessonSoftware";
 import { LessonVideos } from "@/components/LessonVideos";
 import { ListeningPractice } from "@/components/ListeningPractice";
+import { MathFunBanner } from "@/components/MathFunBanner";
 import { Quiz } from "@/components/Quiz";
 import { CELLS_LEARN_PATH } from "@/content/cells-learn-path";
 import {
@@ -15,6 +19,10 @@ import {
 } from "@/content/language-audio";
 import { enrichLesson, videosForMode } from "@/lib/lesson-enrich";
 import { getNextLesson } from "@/lib/pathway";
+import {
+  isLessonUnlocked,
+  YEAR_PASS_OVERALL,
+} from "@/lib/progression";
 import {
   lessonKey,
   loadProgress,
@@ -32,22 +40,13 @@ import {
   sessionsToday,
   loadSessions,
 } from "@/lib/schedule";
-import {
-  diagnosticPassed,
-  isMastery,
-  loadSelfPace,
-  paceLabel,
-  recordQuizResult,
-  setPreferFastTrack,
-  type SelfPaceState,
-} from "@/lib/self-pace";
 import type { AudioPhrase, LearnBeat, Lesson, ListeningItem } from "@/lib/types";
 
 type Props = {
   lesson: Lesson;
 };
 
-type PaceMode = "guided" | "depth" | "fast";
+type DepthMode = "core" | "depth";
 
 function resolveLearnPath(lesson: Lesson): LearnBeat[] {
   if (lesson.learnPath && lesson.learnPath.length > 0) return lesson.learnPath;
@@ -62,11 +61,11 @@ export function LessonClient({ lesson }: Props) {
   const [showCompletion, setShowCompletion] = useState(false);
   const [pathDone, setPathDone] = useState(false);
   const [showReference, setShowReference] = useState(false);
-  const [pace, setPace] = useState<SelfPaceState | null>(null);
-  const [mode, setMode] = useState<PaceMode>("guided");
-  const [fastUnlocked, setFastUnlocked] = useState(false);
-  const [showDiagnostic, setShowDiagnostic] = useState(false);
-  const [masteryNote, setMasteryNote] = useState<string | null>(null);
+  const [depthMode, setDepthMode] = useState<DepthMode>("core");
+  const [lastScore, setLastScore] = useState<number | null>(null);
+  const [lock, setLock] = useState<{ unlocked: boolean; reason?: string }>({
+    unlocked: true,
+  });
 
   const key = lessonKey(
     lesson.year,
@@ -77,6 +76,7 @@ export function LessonClient({ lesson }: Props) {
 
   const learnPath = useMemo(() => resolveLearnPath(lesson), [lesson]);
   const hasGuidedPath = learnPath.length > 0;
+  const hasQuiz = Boolean(lesson.quiz && lesson.quiz.length > 0);
 
   const nextLesson = useMemo(
     () =>
@@ -109,21 +109,35 @@ export function LessonClient({ lesson }: Props) {
     return { phrases, listening };
   }, [lesson]);
 
-  const displayVideos = useMemo(() => {
-    if (mode === "depth") return videosForMode(enriched.resolvedVideos, "depth");
-    if (mode === "fast") return videosForMode(enriched.resolvedVideos, "fast");
-    return videosForMode(enriched.resolvedVideos, "core");
-  }, [enriched.resolvedVideos, mode]);
+  const displayVideos = useMemo(
+    () =>
+      videosForMode(
+        enriched.resolvedVideos,
+        depthMode === "depth" ? "depth" : "core",
+      ),
+    [enriched.resolvedVideos, depthMode],
+  );
 
-  const contentBlocks = useMemo(() => {
-    if (mode === "depth") return enriched.fullContent;
-    return enriched.coreContent;
-  }, [enriched, mode]);
+  const contentBlocks = useMemo(
+    () =>
+      depthMode === "depth" ? enriched.fullContent : enriched.coreContent,
+    [enriched, depthMode],
+  );
 
   useEffect(() => {
     const map = loadProgress();
-    const isDone = Boolean(map[key]?.completed);
+    const unlock = isLessonUnlocked(
+      lesson.year,
+      lesson.subject,
+      lesson.id,
+      lesson.language,
+      map,
+    );
+    setLock(unlock);
+
+    const isDone = Boolean(map[key]?.completed && map[key]?.quizScore != null);
     setDone(isDone);
+    if (map[key]?.quizScore != null) setLastScore(map[key]!.quizScore!);
     if (isDone && !hasGuidedPath) {
       setShowCompletion(true);
     }
@@ -131,19 +145,8 @@ export function LessonClient({ lesson }: Props) {
       setShowCompletion(false);
       const taught = sessionStorage.getItem(`taught:${key}`);
       if (taught === "1") setPathDone(true);
-      if (taught === "fast") {
-        setPathDone(true);
-        setFastUnlocked(true);
-        setMode("fast");
-      }
     }
-    const sp = loadSelfPace();
-    setPace(sp);
-    if (sp.preferFastTrack && hasGuidedPath) {
-      setMode("fast");
-      setShowDiagnostic(true);
-    }
-  }, [key, hasGuidedPath]);
+  }, [key, hasGuidedPath, lesson]);
 
   function onPathComplete() {
     setPathDone(true);
@@ -154,23 +157,15 @@ export function LessonClient({ lesson }: Props) {
     }
   }
 
-  function unlockFastTrack() {
-    setFastUnlocked(true);
-    setPathDone(true);
-    setMode("fast");
-    setShowDiagnostic(false);
-    try {
-      sessionStorage.setItem(`taught:${key}`, "fast");
-    } catch {
-      /* ignore */
-    }
-  }
+  /** Only after quiz — no skip, no mark-complete without test */
+  function completeFromQuiz(quizScore: number) {
+    if (hasGuidedPath && !pathDone) return;
+    if (!lock.unlocked) return;
 
-  function complete(quizScore?: number) {
-    if (hasGuidedPath && !pathDone && !fastUnlocked) return;
     const wasDone = done;
     markLessonComplete(key, quizScore);
     setDone(true);
+    setLastScore(quizScore);
     setShowCompletion(true);
 
     const active = getActiveBlock();
@@ -193,19 +188,6 @@ export function LessonClient({ lesson }: Props) {
         lesson.id.includes("pattern") ||
         Boolean(lesson.strand?.toLowerCase().includes("pattern"));
 
-      const percent = quizScore ?? 70;
-      const accelerated = fastUnlocked || mode === "fast";
-      const paceState = recordQuizResult(percent, { accelerated });
-      setPace(paceState);
-
-      if (isMastery(percent)) {
-        setMasteryNote(
-          nextLesson
-            ? `Mastery ${percent}% — you can move to the next lesson now and progress faster.`
-            : `Mastery ${percent}% — strong finish on this pathway block.`,
-        );
-      }
-
       const event = grantLessonRewards({
         lessonsCompletedTotal: allCompleted,
         isPatternLesson: isPattern,
@@ -222,221 +204,116 @@ export function LessonClient({ lesson }: Props) {
           (lesson.id.includes("defend-dominance") ||
             lesson.id.includes("cs-y12-exit")),
         claimKey: `lesson:${key}`,
-        quizPercent: percent,
+        quizPercent: quizScore,
         subject: lesson.subject,
       });
       setReward(event);
     }
   }
 
-  function onDiagnosticComplete(percent: number) {
-    if (diagnosticPassed(percent)) {
-      unlockFastTrack();
-      setMasteryNote(
-        `Diagnostic ${percent}% — Fast track unlocked. Skip the long guided path and prove mastery on the full quiz.`,
-      );
-    } else {
-      setShowDiagnostic(false);
-      setMode("guided");
-      setMasteryNote(
-        `Diagnostic ${percent}% — use the guided path so every idea is solid before the quiz.`,
-      );
-    }
-  }
-
   const pathwayEnd = done && !nextLesson;
   const isLanguage = lesson.subject === "language" && lesson.language;
-  const quizUnlocked =
-    !hasGuidedPath || pathDone || fastUnlocked || mode === "fast";
+  const quizUnlocked = !hasGuidedPath || pathDone;
 
-  // Fast mode without diagnostic pass still needs unlock if guided exists
-  const effectiveQuizUnlocked =
-    quizUnlocked &&
-    (mode !== "fast" ||
-      fastUnlocked ||
-      !hasGuidedPath ||
-      pathDone ||
-      !showDiagnostic);
+  if (!lock.unlocked) {
+    return (
+      <div className="space-y-4">
+        <div className="callout callout-warning">
+          <p className="font-semibold text-ink">Lesson locked</p>
+          <p className="mt-2 text-sm text-muted">
+            {lock.reason ??
+              "Complete previous lesson quizzes in order. Skipping is not allowed."}
+          </p>
+        </div>
+        <Link
+          href={
+            lesson.language
+              ? `/year/${lesson.year}/language/${lesson.language}`
+              : `/year/${lesson.year}/${lesson.subject}`
+          }
+          className="btn btn-primary"
+        >
+          ← Back to subject pathway
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 sm:space-y-8">
       {!showCompletion && (
         <>
-          {/* Self-pace + depth controls */}
           <div className="glass-strong rounded-[var(--radius-xl)] p-4 sm:p-5">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
-                  Curriculum lesson · self-paced options
-                </p>
-                <p className="mt-1 text-sm text-muted">
-                  {pace ? paceLabel(pace) : "Loading pace…"}
-                  {pace && pace.masteryCount > 0
-                    ? ` · ${pace.masteryCount} mastery finishes`
-                    : ""}
-                </p>
-              </div>
-              <label className="flex items-center gap-2 text-xs text-muted">
-                <input
-                  type="checkbox"
-                  checked={Boolean(pace?.preferFastTrack)}
-                  onChange={(e) => {
-                    const s = setPreferFastTrack(e.target.checked);
-                    setPace(s);
-                    if (e.target.checked) {
-                      setMode("fast");
-                      setShowDiagnostic(true);
-                    }
-                  }}
-                />
-                Prefer Fast track when ready
-              </label>
-            </div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+              Curriculum rules · no skip
+            </p>
+            <p className="mt-2 text-sm text-muted">
+              Finish the guided path (if any), then sit the{" "}
+              <strong className="text-ink">full lesson quiz</strong> to
+              progress. There is no skip. Year exam can be sat early, but moving
+              year requires <strong className="text-ink">{YEAR_PASS_OVERALL}%
+              overall</strong> across all subjects plus the year exam.
+            </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
                 type="button"
                 className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
-                  mode === "guided"
+                  depthMode === "core"
                     ? "bg-[var(--sky-soft)] ring-1 ring-sky-400"
                     : "bg-[var(--glass-soft)]"
                 }`}
-                onClick={() => {
-                  setMode("guided");
-                  setShowDiagnostic(false);
-                }}
+                onClick={() => setDepthMode("core")}
               >
-                Guided (standard)
+                Core materials
               </button>
               <button
                 type="button"
                 className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
-                  mode === "depth"
+                  depthMode === "depth"
                     ? "bg-[var(--sky-soft)] ring-1 ring-sky-400"
                     : "bg-[var(--glass-soft)]"
                 }`}
-                onClick={() => setMode("depth")}
+                onClick={() => setDepthMode("depth")}
               >
-                In-depth (+ videos)
-              </button>
-              <button
-                type="button"
-                className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
-                  mode === "fast"
-                    ? "bg-[var(--sky-soft)] ring-1 ring-sky-400"
-                    : "bg-[var(--glass-soft)]"
-                }`}
-                onClick={() => {
-                  setMode("fast");
-                  if (hasGuidedPath && !pathDone && !fastUnlocked) {
-                    setShowDiagnostic(true);
-                  }
-                }}
-              >
-                Fast track (self-learn)
+                In-depth + videos
               </button>
             </div>
-            <p className="mt-3 text-xs text-soft">
-              Strong scores unlock faster progress. Struggling? Stay on Guided
-              and use the YouTube support videos. In-depth adds extra curriculum
-              explanation.
-            </p>
           </div>
 
-          {masteryNote && (
-            <div className="callout callout-tip text-sm">{masteryNote}</div>
+          <LessonSoftware subject={lesson.subject} year={lesson.year} />
+
+          {lesson.subject === "math" && <MathFunBanner year={lesson.year} />}
+
+          {lesson.subject === "computerscience" && (
+            <CsPathwayBadge year={lesson.year} />
           )}
 
-          {hasGuidedPath && mode === "guided" && (
+          {hasGuidedPath && (
             <div className="callout callout-info">
-              <strong>How this lesson works:</strong> one idea at a time — pass
-              each check before the next unlocks. The quiz stays locked until
-              the learning path is done (unless you pass a Fast-track
-              diagnostic).
+              <strong>How this lesson works:</strong> learn one idea at a time
+              and pass each check. The quiz unlocks only after the full path —
+              then you must sit the quiz to unlock the next lesson.
             </div>
           )}
 
-          {mode === "fast" &&
-            hasGuidedPath &&
-            !fastUnlocked &&
-            !pathDone &&
-            showDiagnostic &&
-            enriched.resolvedDiagnostic.length > 0 && (
-              <section className="glass rounded-[var(--radius-xl)] p-5 space-y-3">
-                <h2 className="heading-section text-lg">
-                  Fast-track diagnostic
-                </h2>
-                <p className="text-sm text-muted">
-                  Already know this? Score {80}%+ on a short check to skip the
-                  full guided path and jump to the main quiz. If not, we&apos;ll
-                  send you back to Guided teaching.
-                </p>
-                <Quiz
-                  questions={enriched.resolvedDiagnostic}
-                  onComplete={onDiagnosticComplete}
-                />
-                <button
-                  type="button"
-                  className="btn btn-ghost text-xs"
-                  onClick={() => {
-                    setMode("guided");
-                    setShowDiagnostic(false);
-                  }}
-                >
-                  Cancel — use guided path
-                </button>
-              </section>
-            )}
+          {hasGuidedPath && !pathDone && (
+            <GuidedLearning
+              beats={learnPath}
+              lessonTitle={lesson.title}
+              onPathComplete={onPathComplete}
+            />
+          )}
 
-          {mode === "fast" &&
-            hasGuidedPath &&
-            !fastUnlocked &&
-            !pathDone &&
-            !showDiagnostic && (
-              <div className="callout callout-warning text-sm">
-                Fast track needs a diagnostic pass.{" "}
-                <button
-                  type="button"
-                  className="text-accent underline"
-                  onClick={() => setShowDiagnostic(true)}
-                >
-                  Take diagnostic
-                </button>{" "}
-                or switch to Guided.
-              </div>
-            )}
-
-          {hasGuidedPath &&
-            !pathDone &&
-            mode === "guided" && (
-              <GuidedLearning
-                beats={learnPath}
-                lessonTitle={lesson.title}
-                onPathComplete={onPathComplete}
-              />
-            )}
-
-          {hasGuidedPath && pathDone && mode !== "fast" && (
+          {hasGuidedPath && pathDone && (
             <div className="callout callout-tip">
-              Learning path complete — quiz unlocked. Open reference notes or
-              In-depth for more videos and detail.
+              Learning path complete — sit the quiz below to record your score
+              and unlock the next lesson.
             </div>
           )}
 
-          {fastUnlocked && (
-            <div className="callout callout-tip">
-              Fast track active — full quiz unlocked. Optional videos below if
-              you want a quick refresh.
-            </div>
-          )}
-
-          {/* Core / depth written curriculum */}
-          {(!hasGuidedPath ||
-            showReference ||
-            pathDone ||
-            mode === "depth" ||
-            mode === "fast") && (
+          {(!hasGuidedPath || showReference || pathDone) && (
             <>
-              {hasGuidedPath && mode === "guided" && (
+              {hasGuidedPath && (
                 <button
                   type="button"
                   className="btn btn-ghost btn-chip"
@@ -445,11 +322,7 @@ export function LessonClient({ lesson }: Props) {
                   {showReference ? "Hide" : "Show"} full reference notes
                 </button>
               )}
-              {(mode === "depth" ||
-                mode === "fast" ||
-                !hasGuidedPath ||
-                showReference ||
-                pathDone) && (
+              {(!hasGuidedPath || showReference || pathDone) && (
                 <ContentBlocks
                   blocks={contentBlocks}
                   language={lesson.language}
@@ -459,19 +332,13 @@ export function LessonClient({ lesson }: Props) {
           )}
 
           {displayVideos.length > 0 &&
-            (mode === "depth" ||
-              mode === "fast" ||
-              !hasGuidedPath ||
-              pathDone ||
-              showReference) && (
+            (!hasGuidedPath || pathDone || showReference || depthMode === "depth") && (
               <LessonVideos
                 videos={displayVideos}
                 title={
-                  mode === "depth"
+                  depthMode === "depth"
                     ? "In-depth curriculum videos"
-                    : mode === "fast"
-                      ? "Quick support videos"
-                      : "Curriculum videos"
+                    : "Curriculum videos"
                 }
               />
             )}
@@ -487,49 +354,36 @@ export function LessonClient({ lesson }: Props) {
             />
           )}
 
-          {lesson.quiz && lesson.quiz.length > 0 && (
+          {hasQuiz ? (
             <>
-              {!effectiveQuizUnlocked ? (
+              {!quizUnlocked ? (
                 <div className="glass rounded-[var(--radius-xl)] p-5 text-center">
                   <p className="font-semibold text-ink">Quiz locked</p>
                   <p className="mt-2 text-sm text-muted">
-                    Finish the guided path, or pass the Fast-track diagnostic
-                    (80%+) if you already know this topic.
+                    Complete every guided step first. No skipping to the test.
                   </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <p className="text-sm text-muted">
-                    Score <strong className="text-ink">85%+</strong> for mastery
-                    — you can move on faster and keep Fast track for later
-                    lessons.
+                    You must finish this quiz to progress. Your score counts
+                    toward the <strong className="text-ink">{YEAR_PASS_OVERALL}%
+                    overall</strong> required across all subjects.
                   </p>
                   <Quiz
-                    questions={lesson.quiz}
-                    onComplete={(score) => complete(score)}
+                    questions={lesson.quiz!}
+                    onComplete={(score) => completeFromQuiz(score)}
                   />
                 </div>
               )}
             </>
+          ) : (
+            <div className="callout callout-warning text-sm">
+              This block has no quiz bank yet — open the next numbered lesson
+              once available, or contact your curriculum admin. Progression
+              still requires tests on all assessed lessons.
+            </div>
           )}
-
-          <div className="glass flex flex-col gap-3 rounded-[var(--radius-lg)] p-4 sm:flex-row sm:flex-wrap sm:items-center sm:p-5">
-            <button
-              type="button"
-              onClick={() => complete()}
-              disabled={hasGuidedPath && !pathDone && !fastUnlocked}
-              className="btn btn-ok"
-            >
-              Mark {lesson.estimatedMinutes || 30}-min block complete
-            </button>
-            <span className="text-sm text-muted">
-              {hasGuidedPath && !pathDone && !fastUnlocked
-                ? "Complete guided path or Fast-track diagnostic first."
-                : isLanguage
-                  ? "Listen, then mark complete."
-                  : "Finish the quiz when ready, then mark complete."}
-            </span>
-          </div>
 
           {hasGuidedPath && pathDone && (
             <button
@@ -537,7 +391,6 @@ export function LessonClient({ lesson }: Props) {
               className="btn btn-ghost btn-chip"
               onClick={() => {
                 setPathDone(false);
-                setFastUnlocked(false);
                 try {
                   sessionStorage.removeItem(`taught:${key}`);
                 } catch {
@@ -553,8 +406,13 @@ export function LessonClient({ lesson }: Props) {
 
       {showCompletion && (
         <>
-          {masteryNote && (
-            <div className="callout callout-tip text-sm">{masteryNote}</div>
+          {lastScore != null && (
+            <div className="callout callout-tip text-sm">
+              Quiz recorded: <strong className="text-ink">{lastScore}%</strong>.
+              Next lesson unlocks only after this score is saved (done). Aim for
+              high averages — year progress needs {YEAR_PASS_OVERALL}% overall
+              in all subjects.
+            </div>
           )}
           <CompletionPanel
             lesson={lesson}
@@ -567,15 +425,10 @@ export function LessonClient({ lesson }: Props) {
             className="btn btn-ghost btn-chip"
             onClick={() => {
               setShowCompletion(false);
-              if (hasGuidedPath) {
-                setPathDone(false);
-                setFastUnlocked(false);
-              }
+              if (hasGuidedPath) setPathDone(false);
             }}
           >
-            {hasGuidedPath
-              ? "Retrain this lesson (guided path)"
-              : "Review lesson again"}
+            Review lesson materials again
           </button>
         </>
       )}

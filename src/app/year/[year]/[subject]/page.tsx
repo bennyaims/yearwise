@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { CsSubjectClient } from "@/components/CsSubjectClient";
+import { MathFunBanner } from "@/components/MathFunBanner";
 import { SubjectLessonList } from "@/components/SubjectLessonList";
 import { getLessonsFor } from "@/content/lessons";
 import { getSubject, YEARS } from "@/lib/subjects";
@@ -57,6 +59,18 @@ export default async function SubjectPage({ params }: Props) {
   const meta = getSubject(subject);
   if (!meta) notFound();
 
+  if (subject === "computerscience") {
+    return (
+      <CsSubjectClient
+        year={year}
+        subjectColor={meta.color}
+        subjectIcon={meta.icon}
+        subjectName={meta.name}
+        description={meta.description}
+      />
+    );
+  }
+
   const lessons = getLessonsFor(year, subject);
 
   return (
@@ -86,24 +100,17 @@ export default async function SubjectPage({ params }: Props) {
 
       <p className="mt-4 text-sm text-muted sm:text-base">{meta.description}</p>
 
+      {subject === "math" && (
+        <div className="mt-4">
+          <MathFunBanner year={year} />
+        </div>
+      )}
+
       {subject === "history" && (
         <div className="callout callout-unfiltered mt-4">
           <strong>Unfiltered track:</strong> these lessons include invasion,
           frontier violence, racial policy and contested national memory. They
           are written for secondary students who can handle evidence and debate.
-        </div>
-      )}
-
-      {subject === "computerscience" && (
-        <div className="callout callout-info mt-4">
-          <strong>Exit goal (Year 12):</strong> write code that creates AI
-          systems (data → train/evaluate → document), and design multi-layer
-          defences so AI cannot dominate or catastrophically harm people —
-          technical controls <em>and</em> civic oversight.{" "}
-          <a href="/labs/genesis" className="font-semibold underline">
-            Open Genesis Lab
-          </a>{" "}
-          for self-replicating coded life in 3D worlds.
         </div>
       )}
 

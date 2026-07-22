@@ -1,9 +1,12 @@
 /**
  * Enrich any curriculum lesson with matched YouTube + optional depth copy.
  * Does not replace authored content — merges support materials.
+ * Also attaches free software tutorials (GeoGebra, Blender, …) by subject.
  */
 
+import { designsForYear } from "@/content/geogebra-designs";
 import { matchCurriculumVideos } from "@/content/curriculum-videos";
+import { softwareForSubject } from "@/content/curriculum-software";
 import type {
   ContentBlock,
   Lesson,
@@ -43,13 +46,63 @@ function depthBlocksFromParagraphs(paragraphs: string[]): ContentBlock[] {
     {
       type: "callout",
       tone: "info",
-      text: "Optional in-depth material. Self-learners who already scored well can skip this and move to the next lesson after the quiz.",
+      text: "Optional in-depth material — extra practice and ideas. You still must finish the lesson quiz to progress (no skipping tests).",
     },
   ];
   for (const p of paragraphs) {
     blocks.push({ type: "paragraph", text: p });
   }
   return blocks;
+}
+
+/** Fun GeoGebra design challenge matched loosely to lesson topic */
+function geogebraFunBlocks(lesson: Lesson): ContentBlock[] {
+  if (lesson.subject !== "math") return [];
+  const designs = designsForYear(lesson.year);
+  if (designs.length === 0) return [];
+  const text = `${lesson.id} ${lesson.title} ${lesson.strand ?? ""} ${lesson.summary}`.toLowerCase();
+  let pick = designs[0]!;
+  if (/integer|number line|negative|order/.test(text)) {
+    pick = designs.find((d) => d.id === "gg-number-line-art") ?? pick;
+  } else if (/angle|circle|geometry|shape|polygon|triangle/.test(text)) {
+    pick =
+      designs.find((d) => d.id === "gg-mandala-circles") ??
+      designs.find((d) => d.id === "gg-polygon-tessellation") ??
+      pick;
+  } else if (/algebra|equation|linear|function|graph|quadrat/.test(text)) {
+    pick =
+      designs.find((d) => d.id === "gg-function-mountain") ??
+      designs.find((d) => d.id === "gg-family-portrait") ??
+      pick;
+  } else if (/trig|sin|cos|period/.test(text)) {
+    pick = designs.find((d) => d.id === "gg-spiro-trig") ?? pick;
+  } else if (/pattern|sequence|transform|symmetry/.test(text)) {
+    pick = designs.find((d) => d.id === "gg-slider-kaleidoscope") ?? pick;
+  } else {
+    // Rotate fun pick by year index into available designs
+    pick = designs[lesson.year % designs.length]!;
+  }
+
+  return [
+    {
+      type: "heading",
+      text: "Make it fun · GeoGebra design challenge",
+    },
+    {
+      type: "callout",
+      tone: "tip",
+      text: `🎨 ${pick.title} — ${pick.vibe}. ${pick.wow} Open GeoGebra Classic and build it, then screenshot. Full studio: Build Lab → GeoGebra design studio (beginner → expert).`,
+    },
+    {
+      type: "list",
+      ordered: true,
+      items: pick.steps.slice(0, 5),
+    },
+    {
+      type: "paragraph",
+      text: `Maths you practice while designing: ${pick.maths.join(", ")}.`,
+    },
+  ];
 }
 
 /** Build a short diagnostic from the main quiz (first 3 items) */
@@ -64,10 +117,34 @@ export function diagnosticFromQuiz(quiz?: QuizQuestion[]): QuizQuestion[] {
 /**
  * Resolve videos + depth for a lesson (safe on server and client).
  */
+/** Software install / how-to videos for tools used in this subject */
+function softwareTutorialVideos(lesson: Lesson): LessonVideo[] {
+  const tools = softwareForSubject(lesson.subject, lesson.year);
+  const out: LessonVideo[] = [];
+  for (const tool of tools.slice(0, 3)) {
+    for (const t of tool.tutorials.slice(0, 1)) {
+      out.push({
+        youtubeId: t.youtubeId,
+        title: `${tool.name}: ${t.title}`,
+        channel: t.channel,
+        why: `${tool.lessonTip} Download: ${tool.downloadUrl}`,
+        minutes: t.minutes,
+        role: tool.id === "geogebra" || tool.id === "blender" ? "core" : "depth",
+      });
+    }
+  }
+  return out;
+}
+
 export function enrichLesson(lesson: Lesson): EnrichedLesson {
   const matched = matchCurriculumVideos(lesson);
+  const softwareVids = softwareTutorialVideos(lesson);
   const authored = lesson.videos ?? [];
-  const resolvedVideos = dedupeVideos([...authored, ...matched.videos]);
+  const resolvedVideos = dedupeVideos([
+    ...authored,
+    ...matched.videos,
+    ...softwareVids,
+  ]);
 
   const bankDepth = depthBlocksFromParagraphs(matched.depthParagraphs);
   const authoredDepth = lesson.depthContent ?? [];
@@ -100,8 +177,11 @@ export function enrichLesson(lesson: Lesson): EnrichedLesson {
       minutes: v.minutes,
     }));
 
+  const funBlocks = geogebraFunBlocks(lesson);
+
   const coreContent: ContentBlock[] = [
     ...lesson.content,
+    ...funBlocks,
     ...(videoBlocks.length > 0
       ? [
           {

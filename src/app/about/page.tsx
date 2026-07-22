@@ -65,17 +65,35 @@ export default function AboutPage() {
             attack on the country students live in.
           </p>
           <h2 className="heading-section text-xl text-ink">
-            In-depth lessons, video &amp; self-pace
+            Signup software pack
+          </h2>
+          <p>
+            At signup, students get download links for free curriculum programs:{" "}
+            <strong className="text-ink">GeoGebra</strong> (Maths),{" "}
+            <strong className="text-ink">Blender</strong> (3D animation), VS
+            Code, Python, MuseScore, Audacity, LibreOffice, and Desmos. Starter
+            tutorials ship with each tool and reappear inside matching lessons.
+            Revisit anytime under <strong className="text-ink">Tools</strong>.
+          </p>
+          <h2 className="heading-section text-xl text-ink">
+            Progression · no skipping
+          </h2>
+          <p>
+            Students must finish every lesson quiz in order — there is no skip
+            path. The Year exam may be sat early, but unlocking the next year
+            requires <strong className="text-ink">92% overall</strong> across
+            all subjects, all lesson quizzes complete, and{" "}
+            <strong className="text-ink">92%+</strong> on the year exam.
+          </p>
+          <h2 className="heading-section text-xl text-ink">
+            In-depth lessons &amp; video
           </h2>
           <p>
             Lessons include core teaching, optional{" "}
             <strong className="text-ink">In-depth</strong> material, and curated{" "}
-            <strong className="text-ink">YouTube videos</strong> matched to the
-            topic (pause-and-learn). Students who already know a topic can take a{" "}
-            <strong className="text-ink">Fast-track diagnostic</strong> (80%+)
-            to skip the long guided path, then still sit the full quiz. Scores
-            of 85%+ count as mastery and encourage moving to the next lesson
-            sooner — self-learning without leaving gaps.
+            <strong className="text-ink">YouTube videos</strong> plus software
+            tutorials. Extra depth helps learning — it does not replace required
+            tests.
           </p>
           <h2 className="heading-section text-xl text-ink">Curriculum note</h2>
           <p>

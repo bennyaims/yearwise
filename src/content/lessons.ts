@@ -44,7 +44,12 @@ export const LESSONS: Lesson[] = [
       {
         type: "callout",
         tone: "tip",
-        text: "When comparing negatives, the number farther left is smaller: −8 < −3. Aim to finish this block’s quiz in this 30-minute session. Use In-depth for more practice and YouTube support, or Fast track if you already know this.",
+        text: "When comparing negatives, the number farther left is smaller: −8 < −3. Finish the quiz to unlock the next lesson. For fun: build a Number-line city skyline in GeoGebra (Build Lab → GeoGebra design studio).",
+      },
+      {
+        type: "callout",
+        tone: "tip",
+        text: "🎨 GeoGebra fun: plot integers on the x-axis and raise “buildings” with height |n|. Colour positives warm and negatives cool — maths you can see.",
       },
     ],
     depthContent: [
@@ -63,6 +68,7 @@ export const LESSONS: Lesson[] = [
           "Draw a number line from −10 to 10 and place four integers.",
           "Write two real-world sentences that use negatives (money, height, temperature).",
           "State the opposite of each integer you placed.",
+          "GeoGebra: make the skyline design, then screenshot for your folio.",
         ],
       },
       {
@@ -2185,11 +2191,18 @@ export function getLessonsFor(
   year: YearLevel,
   subject: SubjectId,
   language?: LanguageId,
+  /** CS pathway filter — when set, only core + that pathway electives */
+  csPathway?: import("@/lib/types").CsPathwayId,
 ): Lesson[] {
   return LESSONS.filter((l) => {
     if (l.year !== year || l.subject !== subject) return false;
     if (subject === "language") {
       return language ? l.language === language : true;
+    }
+    if (subject === "computerscience" && csPathway) {
+      const tags = l.csPathways;
+      if (!tags || tags.length === 0) return true; // core
+      return tags.includes(csPathway);
     }
     return true;
   });
