@@ -64,6 +64,19 @@ export default function AboutPage() {
             debates. Facing evidence is part of a mature education — not an
             attack on the country students live in.
           </p>
+          <h2 className="heading-section text-xl text-ink">
+            In-depth lessons, video &amp; self-pace
+          </h2>
+          <p>
+            Lessons include core teaching, optional{" "}
+            <strong className="text-ink">In-depth</strong> material, and curated{" "}
+            <strong className="text-ink">YouTube videos</strong> matched to the
+            topic (pause-and-learn). Students who already know a topic can take a{" "}
+            <strong className="text-ink">Fast-track diagnostic</strong> (80%+)
+            to skip the long guided path, then still sit the full quiz. Scores
+            of 85%+ count as mastery and encourage moving to the next lesson
+            sooner — self-learning without leaving gaps.
+          </p>
           <h2 className="heading-section text-xl text-ink">Curriculum note</h2>
           <p>
             Content is structured for the Australian Curriculum Years 7–10 and

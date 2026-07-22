@@ -61,7 +61,7 @@ export function CompletionPanel({
       <div className="grid gap-3 sm:grid-cols-2">
         {nextLesson ? (
           <Link href={lessonHref(nextLesson)} className="btn btn-primary">
-            Next fluency block
+            Next lesson
             {nextLesson.year !== lesson.year
               ? ` (Year ${nextLesson.year})`
               : ""}{" "}
@@ -112,8 +112,14 @@ export function CompletionPanel({
 
       {!nextLesson && subjectComplete && (
         <p className="text-sm text-muted">
-          Nice work — you finished every integers block in this pathway. Sit the
-          weekly test for extra stars.
+          Nice work — you finished this pathway block. Sit the weekly test for
+          extra stars, or open another subject.
+        </p>
+      )}
+      {nextLesson && (
+        <p className="text-sm text-muted">
+          High quiz scores keep Fast track available so you can progress
+          quicker when you already know the material.
         </p>
       )}
     </div>

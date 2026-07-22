@@ -28,14 +28,16 @@ export default function HomePage() {
             </h1>
             <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
               Full Australian secondary{" "}
-              <strong className="text-ink">curriculum</strong> — Maths, Science,
-              Chemistry, English, History, Music, languages, and Computer
-              Science. Timed study blocks, guided lessons, and weekly tests.
-              Within Digital Technologies, students{" "}
-              <strong className="text-ink">learn coding and 3D animation</strong>{" "}
-              by building real educational systems (scores, simulations, Blender
-              assets) that support Genesis science projects — applied practice,
-              not a separate entertainment product.
+              <strong className="text-ink">curriculum</strong> (Years 7–12) —
+              Maths, Science, Chemistry, English, History, Music, languages, and
+              Computer Science. In-depth lessons with{" "}
+              <strong className="text-ink">YouTube support videos</strong> woven
+              in, guided teaching checks, and{" "}
+              <strong className="text-ink">self-paced Fast track</strong> so
+              strong students can prove mastery and move ahead. Build Lab teaches{" "}
+              <strong className="text-ink">coding and 3D animation</strong> as
+              curriculum Digital Technologies — applied systems for Genesis
+              science, not a separate entertainment product.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
               <Link href="/year/7/math" className="btn btn-primary">

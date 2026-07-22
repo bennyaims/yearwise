@@ -44,7 +44,31 @@ export const LESSONS: Lesson[] = [
       {
         type: "callout",
         tone: "tip",
-        text: "When comparing negatives, the number farther left is smaller: −8 < −3. Aim to finish this block’s quiz in this 30-minute session.",
+        text: "When comparing negatives, the number farther left is smaller: −8 < −3. Aim to finish this block’s quiz in this 30-minute session. Use In-depth for more practice and YouTube support, or Fast track if you already know this.",
+      },
+    ],
+    depthContent: [
+      {
+        type: "heading",
+        text: "In depth: comparing and real contexts",
+      },
+      {
+        type: "paragraph",
+        text: "When both numbers are negative, the one with the larger absolute value is smaller (farther from zero on the left). So −20 is colder and “more negative” than −5.",
+      },
+      {
+        type: "list",
+        ordered: true,
+        items: [
+          "Draw a number line from −10 to 10 and place four integers.",
+          "Write two real-world sentences that use negatives (money, height, temperature).",
+          "State the opposite of each integer you placed.",
+        ],
+      },
+      {
+        type: "example",
+        title: "Worked context",
+        body: "A scuba diver is at −12 m, then rises 5 m. New depth: −12 + 5 = −7 m (still below sea level).",
       },
     ],
     quiz: [

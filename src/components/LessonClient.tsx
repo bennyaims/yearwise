@@ -5,6 +5,7 @@ import { AudioPhrases } from "@/components/AudioPhrases";
 import { CompletionPanel } from "@/components/CompletionPanel";
 import { ContentBlocks } from "@/components/ContentBlocks";
 import { GuidedLearning } from "@/components/GuidedLearning";
+import { LessonVideos } from "@/components/LessonVideos";
 import { ListeningPractice } from "@/components/ListeningPractice";
 import { Quiz } from "@/components/Quiz";
 import { CELLS_LEARN_PATH } from "@/content/cells-learn-path";
@@ -12,6 +13,7 @@ import {
   getAudioPack,
   tierFromLessonId,
 } from "@/content/language-audio";
+import { enrichLesson, videosForMode } from "@/lib/lesson-enrich";
 import { getNextLesson } from "@/lib/pathway";
 import {
   lessonKey,
@@ -30,25 +32,41 @@ import {
   sessionsToday,
   loadSessions,
 } from "@/lib/schedule";
+import {
+  diagnosticPassed,
+  isMastery,
+  loadSelfPace,
+  paceLabel,
+  recordQuizResult,
+  setPreferFastTrack,
+  type SelfPaceState,
+} from "@/lib/self-pace";
 import type { AudioPhrase, LearnBeat, Lesson, ListeningItem } from "@/lib/types";
 
 type Props = {
   lesson: Lesson;
 };
 
+type PaceMode = "guided" | "depth" | "fast";
+
 function resolveLearnPath(lesson: Lesson): LearnBeat[] {
   if (lesson.learnPath && lesson.learnPath.length > 0) return lesson.learnPath;
-  // Hard-wire deep path for cells so it always teaches properly
   if (lesson.id === "cells-as-units") return CELLS_LEARN_PATH;
   return [];
 }
 
 export function LessonClient({ lesson }: Props) {
+  const enriched = useMemo(() => enrichLesson(lesson), [lesson]);
   const [done, setDone] = useState(false);
   const [reward, setReward] = useState<RewardEvent | null>(null);
   const [showCompletion, setShowCompletion] = useState(false);
   const [pathDone, setPathDone] = useState(false);
   const [showReference, setShowReference] = useState(false);
+  const [pace, setPace] = useState<SelfPaceState | null>(null);
+  const [mode, setMode] = useState<PaceMode>("guided");
+  const [fastUnlocked, setFastUnlocked] = useState(false);
+  const [showDiagnostic, setShowDiagnostic] = useState(false);
+  const [masteryNote, setMasteryNote] = useState<string | null>(null);
 
   const key = lessonKey(
     lesson.year,
@@ -91,21 +109,39 @@ export function LessonClient({ lesson }: Props) {
     return { phrases, listening };
   }, [lesson]);
 
+  const displayVideos = useMemo(() => {
+    if (mode === "depth") return videosForMode(enriched.resolvedVideos, "depth");
+    if (mode === "fast") return videosForMode(enriched.resolvedVideos, "fast");
+    return videosForMode(enriched.resolvedVideos, "core");
+  }, [enriched.resolvedVideos, mode]);
+
+  const contentBlocks = useMemo(() => {
+    if (mode === "depth") return enriched.fullContent;
+    return enriched.coreContent;
+  }, [enriched, mode]);
+
   useEffect(() => {
     const map = loadProgress();
     const isDone = Boolean(map[key]?.completed);
     setDone(isDone);
-    // Do NOT auto-open completion if they need to retrain — only if done
-    // and they haven't started guided path this session
     if (isDone && !hasGuidedPath) {
       setShowCompletion(true);
     }
-    // Guided lessons: start teaching even if previously marked complete
-    // (old short version may have been completed without real learning)
     if (hasGuidedPath) {
       setShowCompletion(false);
       const taught = sessionStorage.getItem(`taught:${key}`);
       if (taught === "1") setPathDone(true);
+      if (taught === "fast") {
+        setPathDone(true);
+        setFastUnlocked(true);
+        setMode("fast");
+      }
+    }
+    const sp = loadSelfPace();
+    setPace(sp);
+    if (sp.preferFastTrack && hasGuidedPath) {
+      setMode("fast");
+      setShowDiagnostic(true);
     }
   }, [key, hasGuidedPath]);
 
@@ -118,8 +154,20 @@ export function LessonClient({ lesson }: Props) {
     }
   }
 
+  function unlockFastTrack() {
+    setFastUnlocked(true);
+    setPathDone(true);
+    setMode("fast");
+    setShowDiagnostic(false);
+    try {
+      sessionStorage.setItem(`taught:${key}`, "fast");
+    } catch {
+      /* ignore */
+    }
+  }
+
   function complete(quizScore?: number) {
-    if (hasGuidedPath && !pathDone) return;
+    if (hasGuidedPath && !pathDone && !fastUnlocked) return;
     const wasDone = done;
     markLessonComplete(key, quizScore);
     setDone(true);
@@ -145,6 +193,19 @@ export function LessonClient({ lesson }: Props) {
         lesson.id.includes("pattern") ||
         Boolean(lesson.strand?.toLowerCase().includes("pattern"));
 
+      const percent = quizScore ?? 70;
+      const accelerated = fastUnlocked || mode === "fast";
+      const paceState = recordQuizResult(percent, { accelerated });
+      setPace(paceState);
+
+      if (isMastery(percent)) {
+        setMasteryNote(
+          nextLesson
+            ? `Mastery ${percent}% — you can move to the next lesson now and progress faster.`
+            : `Mastery ${percent}% — strong finish on this pathway block.`,
+        );
+      }
+
       const event = grantLessonRewards({
         lessonsCompletedTotal: allCompleted,
         isPatternLesson: isPattern,
@@ -160,51 +221,222 @@ export function LessonClient({ lesson }: Props) {
           lesson.subject === "computerscience" &&
           (lesson.id.includes("defend-dominance") ||
             lesson.id.includes("cs-y12-exit")),
-        // Game Mode: every subject quiz → coins + character unlocks
         claimKey: `lesson:${key}`,
-        quizPercent: quizScore ?? 70,
+        quizPercent: percent,
         subject: lesson.subject,
       });
       setReward(event);
     }
   }
 
+  function onDiagnosticComplete(percent: number) {
+    if (diagnosticPassed(percent)) {
+      unlockFastTrack();
+      setMasteryNote(
+        `Diagnostic ${percent}% — Fast track unlocked. Skip the long guided path and prove mastery on the full quiz.`,
+      );
+    } else {
+      setShowDiagnostic(false);
+      setMode("guided");
+      setMasteryNote(
+        `Diagnostic ${percent}% — use the guided path so every idea is solid before the quiz.`,
+      );
+    }
+  }
+
   const pathwayEnd = done && !nextLesson;
   const isLanguage = lesson.subject === "language" && lesson.language;
-  const quizUnlocked = !hasGuidedPath || pathDone;
+  const quizUnlocked =
+    !hasGuidedPath || pathDone || fastUnlocked || mode === "fast";
+
+  // Fast mode without diagnostic pass still needs unlock if guided exists
+  const effectiveQuizUnlocked =
+    quizUnlocked &&
+    (mode !== "fast" ||
+      fastUnlocked ||
+      !hasGuidedPath ||
+      pathDone ||
+      !showDiagnostic);
 
   return (
     <div className="space-y-6 sm:space-y-8">
       {!showCompletion && (
         <>
-          {hasGuidedPath && (
+          {/* Self-pace + depth controls */}
+          <div className="glass-strong rounded-[var(--radius-xl)] p-4 sm:p-5">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
+                  Curriculum lesson · self-paced options
+                </p>
+                <p className="mt-1 text-sm text-muted">
+                  {pace ? paceLabel(pace) : "Loading pace…"}
+                  {pace && pace.masteryCount > 0
+                    ? ` · ${pace.masteryCount} mastery finishes`
+                    : ""}
+                </p>
+              </div>
+              <label className="flex items-center gap-2 text-xs text-muted">
+                <input
+                  type="checkbox"
+                  checked={Boolean(pace?.preferFastTrack)}
+                  onChange={(e) => {
+                    const s = setPreferFastTrack(e.target.checked);
+                    setPace(s);
+                    if (e.target.checked) {
+                      setMode("fast");
+                      setShowDiagnostic(true);
+                    }
+                  }}
+                />
+                Prefer Fast track when ready
+              </label>
+            </div>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
+                  mode === "guided"
+                    ? "bg-[var(--sky-soft)] ring-1 ring-sky-400"
+                    : "bg-[var(--glass-soft)]"
+                }`}
+                onClick={() => {
+                  setMode("guided");
+                  setShowDiagnostic(false);
+                }}
+              >
+                Guided (standard)
+              </button>
+              <button
+                type="button"
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
+                  mode === "depth"
+                    ? "bg-[var(--sky-soft)] ring-1 ring-sky-400"
+                    : "bg-[var(--glass-soft)]"
+                }`}
+                onClick={() => setMode("depth")}
+              >
+                In-depth (+ videos)
+              </button>
+              <button
+                type="button"
+                className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
+                  mode === "fast"
+                    ? "bg-[var(--sky-soft)] ring-1 ring-sky-400"
+                    : "bg-[var(--glass-soft)]"
+                }`}
+                onClick={() => {
+                  setMode("fast");
+                  if (hasGuidedPath && !pathDone && !fastUnlocked) {
+                    setShowDiagnostic(true);
+                  }
+                }}
+              >
+                Fast track (self-learn)
+              </button>
+            </div>
+            <p className="mt-3 text-xs text-soft">
+              Strong scores unlock faster progress. Struggling? Stay on Guided
+              and use the YouTube support videos. In-depth adds extra curriculum
+              explanation.
+            </p>
+          </div>
+
+          {masteryNote && (
+            <div className="callout callout-tip text-sm">{masteryNote}</div>
+          )}
+
+          {hasGuidedPath && mode === "guided" && (
             <div className="callout callout-info">
-              <strong>How this lesson works:</strong> you learn one idea at a
-              time and must pass a check before the next idea unlocks. The quiz
-              stays locked until the full learning path is done — so every
-              question is something you already proved you understand.
+              <strong>How this lesson works:</strong> one idea at a time — pass
+              each check before the next unlocks. The quiz stays locked until
+              the learning path is done (unless you pass a Fast-track
+              diagnostic).
             </div>
           )}
 
-          {hasGuidedPath && !pathDone && (
-            <GuidedLearning
-              beats={learnPath}
-              lessonTitle={lesson.title}
-              onPathComplete={onPathComplete}
-            />
-          )}
+          {mode === "fast" &&
+            hasGuidedPath &&
+            !fastUnlocked &&
+            !pathDone &&
+            showDiagnostic &&
+            enriched.resolvedDiagnostic.length > 0 && (
+              <section className="glass rounded-[var(--radius-xl)] p-5 space-y-3">
+                <h2 className="heading-section text-lg">
+                  Fast-track diagnostic
+                </h2>
+                <p className="text-sm text-muted">
+                  Already know this? Score {80}%+ on a short check to skip the
+                  full guided path and jump to the main quiz. If not, we&apos;ll
+                  send you back to Guided teaching.
+                </p>
+                <Quiz
+                  questions={enriched.resolvedDiagnostic}
+                  onComplete={onDiagnosticComplete}
+                />
+                <button
+                  type="button"
+                  className="btn btn-ghost text-xs"
+                  onClick={() => {
+                    setMode("guided");
+                    setShowDiagnostic(false);
+                  }}
+                >
+                  Cancel — use guided path
+                </button>
+              </section>
+            )}
 
-          {hasGuidedPath && pathDone && (
+          {mode === "fast" &&
+            hasGuidedPath &&
+            !fastUnlocked &&
+            !pathDone &&
+            !showDiagnostic && (
+              <div className="callout callout-warning text-sm">
+                Fast track needs a diagnostic pass.{" "}
+                <button
+                  type="button"
+                  className="text-accent underline"
+                  onClick={() => setShowDiagnostic(true)}
+                >
+                  Take diagnostic
+                </button>{" "}
+                or switch to Guided.
+              </div>
+            )}
+
+          {hasGuidedPath &&
+            !pathDone &&
+            mode === "guided" && (
+              <GuidedLearning
+                beats={learnPath}
+                lessonTitle={lesson.title}
+                onPathComplete={onPathComplete}
+              />
+            )}
+
+          {hasGuidedPath && pathDone && mode !== "fast" && (
             <div className="callout callout-tip">
-              Learning path complete — quiz unlocked below. You can still open
-              the reference notes if you want a full reread.
+              Learning path complete — quiz unlocked. Open reference notes or
+              In-depth for more videos and detail.
             </div>
           )}
 
-          {/* Reference notes: optional for guided lessons; primary for others */}
-          {(!hasGuidedPath || showReference || pathDone) && (
+          {fastUnlocked && (
+            <div className="callout callout-tip">
+              Fast track active — full quiz unlocked. Optional videos below if
+              you want a quick refresh.
+            </div>
+          )}
+
+          {/* Core / depth written curriculum */}
+          {(!hasGuidedPath ||
+            showReference ||
+            pathDone ||
+            mode === "depth" ||
+            mode === "fast") && (
             <>
-              {hasGuidedPath && (
+              {hasGuidedPath && mode === "guided" && (
                 <button
                   type="button"
                   className="btn btn-ghost btn-chip"
@@ -213,14 +445,36 @@ export function LessonClient({ lesson }: Props) {
                   {showReference ? "Hide" : "Show"} full reference notes
                 </button>
               )}
-              {(!hasGuidedPath || showReference) && (
+              {(mode === "depth" ||
+                mode === "fast" ||
+                !hasGuidedPath ||
+                showReference ||
+                pathDone) && (
                 <ContentBlocks
-                  blocks={lesson.content}
+                  blocks={contentBlocks}
                   language={lesson.language}
                 />
               )}
             </>
           )}
+
+          {displayVideos.length > 0 &&
+            (mode === "depth" ||
+              mode === "fast" ||
+              !hasGuidedPath ||
+              pathDone ||
+              showReference) && (
+              <LessonVideos
+                videos={displayVideos}
+                title={
+                  mode === "depth"
+                    ? "In-depth curriculum videos"
+                    : mode === "fast"
+                      ? "Quick support videos"
+                      : "Curriculum videos"
+                }
+              />
+            )}
 
           {isLanguage && phrases.length > 0 && (
             <AudioPhrases phrases={phrases} language={lesson.language!} />
@@ -235,20 +489,26 @@ export function LessonClient({ lesson }: Props) {
 
           {lesson.quiz && lesson.quiz.length > 0 && (
             <>
-              {!quizUnlocked ? (
+              {!effectiveQuizUnlocked ? (
                 <div className="glass rounded-[var(--radius-xl)] p-5 text-center">
                   <p className="font-semibold text-ink">Quiz locked</p>
                   <p className="mt-2 text-sm text-muted">
-                    Finish every step of the guided learning path above. Each
-                    check teaches the exact ideas in the quiz (including
-                    “which organelle performs photosynthesis?”).
+                    Finish the guided path, or pass the Fast-track diagnostic
+                    (80%+) if you already know this topic.
                   </p>
                 </div>
               ) : (
-                <Quiz
-                  questions={lesson.quiz}
-                  onComplete={(score) => complete(score)}
-                />
+                <div className="space-y-3">
+                  <p className="text-sm text-muted">
+                    Score <strong className="text-ink">85%+</strong> for mastery
+                    — you can move on faster and keep Fast track for later
+                    lessons.
+                  </p>
+                  <Quiz
+                    questions={lesson.quiz}
+                    onComplete={(score) => complete(score)}
+                  />
+                </div>
               )}
             </>
           )}
@@ -257,14 +517,14 @@ export function LessonClient({ lesson }: Props) {
             <button
               type="button"
               onClick={() => complete()}
-              disabled={hasGuidedPath && !pathDone}
+              disabled={hasGuidedPath && !pathDone && !fastUnlocked}
               className="btn btn-ok"
             >
               Mark {lesson.estimatedMinutes || 30}-min block complete
             </button>
             <span className="text-sm text-muted">
-              {hasGuidedPath && !pathDone
-                ? "Complete the guided path (and ideally the quiz) first."
+              {hasGuidedPath && !pathDone && !fastUnlocked
+                ? "Complete guided path or Fast-track diagnostic first."
                 : isLanguage
                   ? "Listen, then mark complete."
                   : "Finish the quiz when ready, then mark complete."}
@@ -277,6 +537,7 @@ export function LessonClient({ lesson }: Props) {
               className="btn btn-ghost btn-chip"
               onClick={() => {
                 setPathDone(false);
+                setFastUnlocked(false);
                 try {
                   sessionStorage.removeItem(`taught:${key}`);
                 } catch {
@@ -292,6 +553,9 @@ export function LessonClient({ lesson }: Props) {
 
       {showCompletion && (
         <>
+          {masteryNote && (
+            <div className="callout callout-tip text-sm">{masteryNote}</div>
+          )}
           <CompletionPanel
             lesson={lesson}
             nextLesson={nextLesson}
@@ -303,7 +567,10 @@ export function LessonClient({ lesson }: Props) {
             className="btn btn-ghost btn-chip"
             onClick={() => {
               setShowCompletion(false);
-              if (hasGuidedPath) setPathDone(false);
+              if (hasGuidedPath) {
+                setPathDone(false);
+                setFastUnlocked(false);
+              }
             }}
           >
             {hasGuidedPath

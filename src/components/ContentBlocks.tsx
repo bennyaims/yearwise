@@ -1,6 +1,10 @@
 "use client";
 
 import { SpeakButton } from "@/components/SpeakButton";
+import {
+  youtubeEmbedUrl,
+  youtubeWatchUrl,
+} from "@/content/curriculum-videos";
 import type { ContentBlock, LanguageId } from "@/lib/types";
 
 const toneClass = {
@@ -137,6 +141,42 @@ export function ContentBlocks({ blocks, language }: Props) {
                     size="sm"
                   />
                 )}
+              </div>
+            );
+          case "video":
+            return (
+              <div
+                key={i}
+                className="overflow-hidden rounded-[var(--radius-md)] border border-[var(--glass-border)]"
+              >
+                <div className="aspect-video w-full bg-black">
+                  <iframe
+                    title={block.title}
+                    src={youtubeEmbedUrl(block.youtubeId)}
+                    className="h-full w-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+                <div className="bg-[var(--glass-soft)] px-4 py-3">
+                  <div className="text-xs font-bold uppercase tracking-wide text-soft">
+                    Video
+                    {block.minutes != null ? ` · ~${block.minutes} min` : ""}
+                    {block.channel ? ` · ${block.channel}` : ""}
+                  </div>
+                  <p className="mt-1 font-semibold text-ink">{block.title}</p>
+                  {block.note && (
+                    <p className="mt-1 text-sm text-muted">{block.note}</p>
+                  )}
+                  <a
+                    href={youtubeWatchUrl(block.youtubeId)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-2 inline-block text-xs text-accent underline"
+                  >
+                    Open on YouTube
+                  </a>
+                </div>
               </div>
             );
           default:

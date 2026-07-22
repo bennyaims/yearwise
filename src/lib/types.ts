@@ -19,6 +19,18 @@ export type LanguageId =
   | "khmer"
   | "italian";
 
+/** Curated YouTube lesson video (curriculum support) */
+export type LessonVideo = {
+  youtubeId: string;
+  title: string;
+  channel: string;
+  /** Why this video is here (curriculum link) */
+  why: string;
+  minutes?: number;
+  /** core = everyone; depth = optional deeper; accelerate = for fast self-learners */
+  role?: "core" | "depth" | "accelerate";
+};
+
 export type ContentBlock =
   | { type: "paragraph"; text: string }
   | { type: "heading"; text: string }
@@ -26,6 +38,15 @@ export type ContentBlock =
   | { type: "list"; ordered?: boolean; items: string[] }
   | { type: "formula"; latex: string; note?: string }
   | { type: "example"; title: string; body: string }
+  /** Inline curated YouTube (pause-and-learn) */
+  | {
+      type: "video";
+      youtubeId: string;
+      title: string;
+      channel?: string;
+      note?: string;
+      minutes?: number;
+    }
   /** Inline playable pronunciation line (uses device TTS) */
   | {
       type: "audio";
@@ -128,10 +149,26 @@ export type Lesson = {
   strand?: string;
   content: ContentBlock[];
   /**
+   * Optional deeper curriculum content (shown when student chooses In-depth).
+   * Self-learners who already master core can skip and stay on Core/Fast track.
+   */
+  depthContent?: ContentBlock[];
+  /**
+   * Curated YouTube videos intertwined with the lesson.
+   * Also auto-matched from the curriculum video bank when omitted.
+   */
+  videos?: LessonVideo[];
+  /**
    * Guided learning path: teach → check → next.
-   * When present, quiz stays locked until every beat is passed.
+   * When present, quiz stays locked until every beat is passed
+   * (unless self-pace mastery / accelerate unlock).
    */
   learnPath?: LearnBeat[];
+  /**
+   * Short diagnostic for self-learners — pass to unlock Fast track
+   * (skip full guided path, go to quiz sooner).
+   */
+  diagnostic?: QuizQuestion[];
   quiz?: QuizQuestion[];
   /** Pronunciation examples with play buttons */
   audioPhrases?: AudioPhrase[];
@@ -158,4 +195,15 @@ export type LanguageMeta = {
   description: string;
 };
 
-export type ProgressMap = Record<string, { completed: boolean; quizScore?: number; updatedAt: string }>;
+export type ProgressMap = Record<
+  string,
+  {
+    completed: boolean;
+    quizScore?: number;
+    updatedAt: string;
+    /** Self-pace: skipped guided path via diagnostic mastery */
+    accelerated?: boolean;
+    /** Chose in-depth materials */
+    depthMode?: boolean;
+  }
+>;
