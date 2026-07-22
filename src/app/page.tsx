@@ -47,6 +47,9 @@ export default function HomePage() {
               <Link href="/tools" className="btn btn-sky">
                 Tools (GeoGebra, Blender…)
               </Link>
+              <Link href="/times-tables" className="btn btn-sky">
+                Times tables gym
+              </Link>
               <Link href="/game/geogebra" className="btn btn-sky">
                 GeoGebra design studio (fun maths)
               </Link>

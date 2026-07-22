@@ -95,8 +95,10 @@ export function YearProgress({ year }: { year: YearLevel }) {
       <div className="flex flex-wrap gap-2 items-center">
         <Link href={`/year/${year}/exam`} className="btn btn-primary text-xs">
           {report.yearExam
-            ? `Year exam: ${report.yearExam.percent}% (retake)`
-            : "Sit Year exam (early OK)"}
+            ? `Year exam: ${report.yearExam.percent}% (retake · includes prior years)`
+            : year === 7
+              ? "Sit Year exam (early OK)"
+              : "Sit Year exam (includes prior-year memory Qs)"}
         </Link>
         {report.canProgressToNextYear && report.nextYear && (
           <Link

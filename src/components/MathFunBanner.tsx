@@ -9,13 +9,16 @@ export function MathFunBanner({ year }: { year?: YearLevel }) {
     <aside className="callout callout-tip">
       <p className="font-semibold text-ink">Make this maths fun in GeoGebra</p>
       <p className="mt-1 text-sm text-muted">
-        Don&apos;t only read —{" "}
-        <strong className="text-ink">design</strong>. Build star bursts,
-        number-line skylines, kaleidoscopes, function mountains, and (later)
-        parametric galaxies. Beginner → expert tracks wait in the studio.
+        Train <strong className="text-ink">times tables</strong> with mental
+        speed strategies (doubles, nines trick, break-ups), and{" "}
+        <strong className="text-ink">design</strong> in GeoGebra — star bursts,
+        skylines, kaleidoscopes, function mountains, galaxies.
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
-        <Link href="/game/geogebra" className="btn btn-primary text-xs">
+        <Link href="/times-tables" className="btn btn-primary text-xs">
+          Times tables gym (speed strategies)
+        </Link>
+        <Link href="/game/geogebra" className="btn btn-sky text-xs">
           GeoGebra design studio
         </Link>
         <a

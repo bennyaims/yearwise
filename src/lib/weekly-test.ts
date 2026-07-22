@@ -5,10 +5,11 @@ import {
   toQuizQuestions,
 } from "./integer-patterns";
 import { weekKey } from "./rewards";
+import { generateTimesTableQuestions } from "./times-tables";
 import type { QuizQuestion } from "./types";
 
 /**
- * Build this week's test for Year 7 integers pathway (+ randomised patterns).
+ * Weekly test: integers + patterns + times tables (facts & mental strategies).
  */
 export function buildWeeklyTestQuestions(week = weekKey()): QuizQuestion[] {
   const seed = week.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
@@ -40,9 +41,19 @@ export function buildWeeklyTestQuestions(week = weekKey()): QuizQuestion[] {
     [bank[i], bank[j]] = [bank[j]!, bank[i]!];
   }
 
-  const selected = bank.slice(0, 8);
-  const patterns = toQuizQuestions(generatePatternQuestions(4, rng));
-  const all = [...selected, ...patterns];
+  const selected = bank.slice(0, 5);
+  const patterns = toQuizQuestions(generatePatternQuestions(3, rng));
+  const tables = generateTimesTableQuestions(4, rng, {
+    maxFactor: 12,
+    includeStrategyQs: true,
+  }).map((q) => ({
+    ...q,
+    id: `week-tt-${q.id}`,
+    prompt: q.prompt.startsWith("What is")
+      ? `[Times tables] ${q.prompt}`
+      : `[Times tables] ${q.prompt}`,
+  }));
+  const all = [...selected, ...patterns, ...tables];
 
   for (let i = all.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));

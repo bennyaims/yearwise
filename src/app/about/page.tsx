@@ -80,9 +80,12 @@ export default function AboutPage() {
           </h2>
           <p>
             Students must finish every lesson quiz in order — there is no skip
-            path. The Year exam may be sat early, but unlocking the next year
-            requires <strong className="text-ink">92% overall</strong> across
-            all subjects, all lesson quizzes complete, and{" "}
+            path. The Year exam may be sat early. From Year 8 up, year exams{" "}
+            <strong className="text-ink">include prior-year questions</strong>{" "}
+            (tagged e.g. [Y7 memory]) so earlier learning stays sharp. Unlocking
+            the next year requires{" "}
+            <strong className="text-ink">92% overall</strong> across all
+            subjects, all lesson quizzes complete, and{" "}
             <strong className="text-ink">92%+</strong> on the year exam.
           </p>
           <h2 className="heading-section text-xl text-ink">

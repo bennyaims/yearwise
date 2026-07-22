@@ -47,6 +47,12 @@ export function Header() {
             Schedule
           </Link>
           <Link
+            href="/times-tables"
+            className="btn btn-chip btn-ghost !min-h-9 !px-2 text-muted hover:text-ink sm:!px-3"
+          >
+            × Tables
+          </Link>
+          <Link
             href="/weekly-test"
             className="btn btn-chip btn-ghost !min-h-9 !px-2 text-muted hover:text-ink sm:!px-3"
           >

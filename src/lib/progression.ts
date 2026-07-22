@@ -15,9 +15,11 @@ import {
   loadProgress,
 } from "@/lib/progress";
 import { SUBJECTS } from "@/lib/subjects";
+import { makeRng, timesTablesForExam } from "@/lib/times-tables";
 import type {
   LanguageId,
   ProgressMap,
+  QuizQuestion,
   SubjectId,
   YearLevel,
 } from "@/lib/types";
@@ -324,26 +326,144 @@ export function saveYearExam(result: YearExamResult) {
   return result;
 }
 
-/**
- * Build a year exam from existing lesson quizzes (sampled).
- * Early sit allowed — does not unlock next year without 92% rules.
- */
-export function buildYearExamQuestions(year: YearLevel, count = 20) {
-  const lessons = countableLessonsForYear(year);
-  const pool = lessons.flatMap((l) =>
+type TaggedQ = QuizQuestion & { _fromYear: YearLevel; _subject: string };
+
+function poolFromYear(y: YearLevel): TaggedQ[] {
+  return countableLessonsForYear(y).flatMap((l) =>
     (l.quiz ?? []).map((q) => ({
       ...q,
-      id: `ye-${year}-${l.id}-${q.id}`,
+      id: `ye-src${y}-${l.id}-${q.id}`,
+      _fromYear: y,
+      _subject: l.subject,
     })),
   );
-  // Deterministic shuffle by year
-  let seed = year * 9973;
+}
+
+/** How many exam questions and what share is prior-year memory work */
+export function yearExamMixInfo(year: YearLevel): {
+  total: number;
+  currentApprox: number;
+  reviewApprox: number;
+  priorYears: YearLevel[];
+} {
+  const total = yearExamQuestionCount(year);
+  const priorYears = ([7, 8, 9, 10, 11, 12] as YearLevel[]).filter(
+    (y) => y < year,
+  );
+  const reviewShare = year === 7 ? 0 : 0.45;
+  const reviewApprox = Math.round(total * reviewShare);
+  return {
+    total,
+    currentApprox: total - reviewApprox,
+    reviewApprox,
+    priorYears,
+  };
+}
+
+export function yearExamQuestionCount(year: YearLevel): number {
+  // Slightly longer exams as more prior years stack into memory
+  if (year <= 7) return 20;
+  if (year <= 9) return 24;
+  if (year <= 11) return 28;
+  return 30;
+}
+
+function shuffleInPlace<T>(arr: T[], rng: () => number): T[] {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j]!, arr[i]!];
+  }
+  return arr;
+}
+
+/**
+ * Build a year exam that mixes:
+ * - Current-year questions (new learning)
+ * - Previous years' questions (memory / retention)
+ *
+ * Higher years pull a larger review share so nothing is forgotten.
+ * Early sit allowed — does not unlock next year without 92% rules.
+ */
+export function buildYearExamQuestions(
+  year: YearLevel,
+  count?: number,
+): QuizQuestion[] {
+  const total = count ?? yearExamQuestionCount(year);
+  let seed = year * 9973 + 42;
   const rng = () => {
     seed = (seed * 1664525 + 1013904223) >>> 0;
     return seed / 0x100000000;
   };
-  const shuffled = [...pool].sort(() => rng() - 0.5);
-  if (shuffled.length === 0) {
+
+  const priorYears = YEARS_RANGE.filter((y) => y < year) as YearLevel[];
+  // Y7: 100% current. Y8+: ~55% current, ~45% prior (split across earlier years).
+  const reviewShare = year === 7 ? 0 : 0.45;
+  const reviewTarget = Math.round(total * reviewShare);
+  const currentTarget = total - reviewTarget;
+
+  const currentPool = poolFromYear(year).map((q) => ({
+    ...q,
+    prompt: q.prompt,
+    explanation: q.explanation,
+  }));
+
+  const reviewPools = priorYears.map((y) =>
+    poolFromYear(y).map((q) => ({
+      ...q,
+      id: `ye-rev-Y${y}-${q.id}`,
+      prompt: `[Y${y} memory] ${q.prompt}`,
+      explanation: `${q.explanation} (Review from Year ${y} — keep earlier years strong.)`,
+    })),
+  );
+
+  shuffleInPlace(currentPool, rng);
+  for (const p of reviewPools) shuffleInPlace(p, rng);
+
+  const selected: TaggedQ[] = [];
+
+  // Take current-year items
+  selected.push(
+    ...currentPool.slice(0, Math.min(currentTarget, currentPool.length)),
+  );
+
+  // Fair share across prior years so Y7…Y(n-1) stay in memory
+  if (reviewTarget > 0 && reviewPools.length > 0) {
+    const perPrior = Math.max(1, Math.ceil(reviewTarget / reviewPools.length));
+    let need = reviewTarget;
+    for (const pool of reviewPools) {
+      const take = Math.min(perPrior, pool.length, need);
+      selected.push(...pool.slice(0, take));
+      need -= take;
+      if (need <= 0) break;
+    }
+    if (need > 0) {
+      const leftover = reviewPools.flatMap((p) => p.slice(perPrior));
+      shuffleInPlace(leftover, rng);
+      selected.push(...leftover.slice(0, need));
+    }
+  }
+
+  // Top up from current year if prior banks were thin
+  if (selected.length < total) {
+    const used = new Set(selected.map((q) => q.id));
+    const extra = currentPool.filter((q) => !used.has(q.id));
+    selected.push(...extra.slice(0, total - selected.length));
+  }
+
+  // Inject times tables + mental strategy items (memory & fluency)
+  const tablesCount = year <= 7 ? 4 : year <= 9 ? 5 : 6;
+  const tableQs = timesTablesForExam(tablesCount, year, rng);
+  selected.push(
+    ...tableQs.map((q) => ({
+      ...q,
+      _fromYear: year,
+      _subject: "math",
+    })),
+  );
+
+  shuffleInPlace(selected, rng);
+
+  if (selected.length === 0) {
     return [
       {
         id: `ye-${year}-fallback`,
@@ -356,9 +476,17 @@ export function buildYearExamQuestions(year: YearLevel, count = 20) {
         ],
         correctIndex: 0,
         explanation:
-          "No skipping: finish every test. Overall 92% across subjects is required to progress years.",
+          "No skipping: finish every test. Overall 92% across subjects is required to progress years. Year exams also re-test earlier years so memory stays sharp.",
       },
     ];
   }
-  return shuffled.slice(0, Math.min(count, shuffled.length));
+
+  // Prefer total + tables, but cap slightly above total so tables always appear
+  const cap = total + Math.min(2, tablesCount);
+  return selected.slice(0, Math.max(total, Math.min(cap, selected.length))).map(
+    ({ _fromYear, _subject, ...q }) => q,
+  );
 }
+
+/** Years 7…12 for exam mix */
+const YEARS_RANGE: YearLevel[] = [7, 8, 9, 10, 11, 12];

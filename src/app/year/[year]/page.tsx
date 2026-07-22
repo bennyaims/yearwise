@@ -43,9 +43,11 @@ export default async function YearPage({ params }: Props) {
         </h1>
         <p className="mt-2 max-w-2xl text-sm text-muted sm:text-base">
           Select a subject. Finish every lesson quiz in order — no skipping.
-          You may sit the Year exam early; unlocking the next year needs{" "}
+          Year exams mix <strong className="text-ink">this year plus earlier
+          years</strong> so memory stays sharp. You may sit the Year exam early;
+          unlocking the next year needs{" "}
           <strong className="text-ink">92% overall</strong> across all subjects
-          plus 92% on the year exam. Languages: pick one pathway Y7–Y12.
+          plus 92% on the year exam.
         </p>
       </div>
 

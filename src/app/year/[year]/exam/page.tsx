@@ -7,6 +7,7 @@ import {
   buildYearExamQuestions,
   getYearExam,
   saveYearExam,
+  yearExamMixInfo,
   yearProgressReport,
   YEAR_PASS_OVERALL,
   type YearExamResult,
@@ -27,8 +28,13 @@ export default function YearExamPage({ params }: Props) {
   const [retake, setRetake] = useState(false);
   const [reportNote, setReportNote] = useState<string | null>(null);
 
+  const mix = useMemo(
+    () => (valid ? yearExamMixInfo(year) : null),
+    [year, valid],
+  );
+
   const questions = useMemo(
-    () => (valid ? buildYearExamQuestions(year, 20) : []),
+    () => (valid ? buildYearExamQuestions(year) : []),
     [year, valid],
   );
 
@@ -98,21 +104,32 @@ export default function YearExamPage({ params }: Props) {
 
       <header className="glass-strong rounded-[var(--radius-xl)] p-5 sm:p-6">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-accent">
-          Year exam · may sit early
+          Year exam · cumulative memory · may sit early
         </p>
         <h1 className="heading-display mt-2 text-2xl sm:text-3xl">
           Year {year} exam
         </h1>
         <p className="mt-2 text-muted">
-          You may sit this exam before every lesson is done. To{" "}
-          <strong className="text-ink">progress to the next year</strong> you
-          still must: finish <strong className="text-ink">all</strong> subject
-          lesson quizzes, hold{" "}
-          <strong className="text-ink">{YEAR_PASS_OVERALL}% overall</strong>{" "}
-          across subjects, and score{" "}
-          <strong className="text-ink">{YEAR_PASS_OVERALL}%+</strong> on this
-          year exam. No skipping lessons.
+          This exam mixes <strong className="text-ink">this year&apos;s</strong>{" "}
+          work with questions from{" "}
+          <strong className="text-ink">previous years</strong> so knowledge
+          stays in memory. It also includes{" "}
+          <strong className="text-ink">times tables</strong> and mental-speed
+          strategies. Items marked{" "}
+          <strong className="text-ink">[Y7 memory]</strong> /{" "}
+          <strong className="text-ink">[Times tables]</strong> are deliberate
+          review.
         </p>
+        {mix && (
+          <p className="mt-2 text-sm text-soft">
+            About {mix.total} questions
+            {mix.reviewApprox > 0
+              ? ` · ~${mix.currentApprox} from Year ${year} · ~${mix.reviewApprox} from prior years (${mix.priorYears.map((y) => `Y${y}`).join(", ")})`
+              : ` · all from Year ${year} (first secondary year)`}
+            . Need {YEAR_PASS_OVERALL}%+ here plus {YEAR_PASS_OVERALL}% overall
+            across subjects to unlock the next year.
+          </p>
+        )}
       </header>
 
       {existing && !showQuiz && !result && (

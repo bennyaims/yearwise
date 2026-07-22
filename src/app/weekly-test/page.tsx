@@ -44,9 +44,14 @@ export default function WeeklyTestPage() {
           Weekly test
         </h1>
         <p className="mt-2 text-muted">
-          12 questions drawn from Year 7 integers + randomised patterns. Score
-          70%+ for a pass badge; 90%+ for high distinction. Stars are saved on
-          this device.
+          12 questions: Year 7 integers, patterns, and{" "}
+          <strong className="text-ink">times tables</strong> (facts + mental
+          strategies). Score 70%+ for a pass badge; 90%+ for high distinction.
+          Practise tables any time in the{" "}
+          <Link href="/times-tables" className="text-accent underline">
+            Times tables gym
+          </Link>
+          .
         </p>
       </header>
 
