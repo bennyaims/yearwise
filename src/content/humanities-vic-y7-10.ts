@@ -1,0 +1,91 @@
+import type { Lesson } from "@/lib/types";
+
+// HUMANITIES Y7-10 + VCE — Victorian Curriculum F-10 v2.0: History, Geography, Civics, Economics
+export const HUMANITIES_VIC_LESSONS: Lesson[] = [
+  {
+    id: "y7-humanities-ancient-australia",
+    title: "Ancient Australia & First Nations Deep History",
+    summary: "30-min: 65,000+ years of continuous culture, Country, archaeological evidence.",
+    estimatedMinutes: 30,
+    year: 7,
+    subject: "history",
+    strand: "History · Ancient",
+    content: [
+      { type: "paragraph", text: "Aboriginal and Torres Strait Islander peoples have lived on this continent for over 65,000 years — world's oldest continuous cultures. Evidence from Madjedbebe rock shelter, Budj Bim eel traps (6,600 years, UNESCO), and oral histories." },
+      { type: "list", items: ["Country = identity, law, spirituality, not just land", "Terra nullius myth vs reality of managed landscapes (fire-stick farming)", "Budj Bim: complex aquaculture predates Egyptian pyramids", "Oral histories accurately recall sea-level rises 7,000+ years ago"] },
+      { type: "callout", tone: "info", text: "Always use 'invasion' or 'colonisation' not 'settlement' when describing 1788 onwards in Victorian curriculum context — aligns with VCAA Aboriginal perspectives." },
+    ],
+    quiz: [
+      { id: "q1", prompt: "How long have First Nations peoples lived in Australia?", options: ["65,000+ years", "250 years", "500 years", "1,000 years"], correctIndex: 0, explanation: "Archaeological evidence at Madjedbebe." },
+      { id: "q2", prompt: "Budj Bim is:", options: ["Ancient eel trap aquaculture system", "A modern dam", "A European building", "A mountain range"], correctIndex: 0, explanation: "6,600-year-old engineering, UNESCO World Heritage." },
+      { id: "q3", prompt: "Country in First Nations concept means:", options: ["Relationship including law, culture, spirit", "Just dirt", "Only property", "A flag"], correctIndex: 0, explanation: "Holistic concept." },
+      { id: "q4", prompt: "Terra nullius means:", options: ["Land belonging to no one — legal fiction", "Full land", "Many people", "Island"], correctIndex: 0, explanation: "Mabo overturned it 1992." },
+      { id: "q5", prompt: "Fire-stick farming shows:", options: ["Active land management", "No management", "Random fires only", "European technique"], correctIndex: 0, explanation: "Sophisticated land care." },
+      { id: "q6", prompt: "Oral histories can:", options: ["Accurately record events thousands of years ago", "Never be accurate", "Only last 10 years", "Only about food"], correctIndex: 0, explanation: "Cross-checked with geology." },
+    ],
+  },
+  {
+    id: "y8-humanities-geography-liveability",
+    title: "Geography: Liveability & Urbanisation in Melbourne",
+    summary: "30-min: factors influencing liveability, Melbourne case study, data mapping.",
+    estimatedMinutes: 30,
+    year: 8,
+    subject: "history",
+    strand: "Geography",
+    content: [
+      { type: "paragraph", text: "Liveability = how pleasant a place is to live: safety, healthcare, education, infrastructure, environment. Melbourne consistently ranks high but liveability varies by suburb." },
+      { type: "list", items: ["Objective factors: transport, hospitals, air quality", "Subjective: sense of community, belonging", "Urbanisation: 75% of Australians live in cities", "Use GIS, census data to compare — e.g. 3023 vs inner city"] },
+    ],
+    quiz: [
+      { id: "q1", prompt: "Liveability includes:", options: ["Safety, health, education, environment", "Only weather", "Only house price", "Only population size"], correctIndex: 0, explanation: "Multi-factor." },
+      { id: "q2", prompt: "GIS stands for:", options: ["Geographic Information System", "General Info Service", "Global Internet System", "Geo Image System"], correctIndex: 0, explanation: "Mapping tool." },
+      { id: "q3", prompt: "Urbanisation means:", options: ["More people living in urban areas", "People leaving cities", "Only farms growing", "No change"], correctIndex: 0, explanation: "Rural → urban shift." },
+      { id: "q4", prompt: "Objective liveability factor:", options: ["Number of hospitals", "Feeling happy only", "Your favourite colour", "Luck"], correctIndex: 0, explanation: "Measurable." },
+      { id: "q5", prompt: "Melbourne's liveability challenge includes:", options: ["Housing affordability, transport, urban sprawl", "No challenges", "Too few people", "No transport needed"], correctIndex: 0, explanation: "Real issues." },
+      { id: "q6", prompt: "To compare suburbs you would use:", options: ["Census data, maps, stats", "Only one photo", "Guess", "No data"], correctIndex: 0, explanation: "Evidence-based geography." },
+    ],
+  },
+  {
+    id: "y9-humanities-civics-constitution",
+    title: "Civics & Citizenship: Constitution, Democracy & Rights in Australia",
+    summary: "30-min: Australian Constitution, levels of government, High Court, democratic values — Vic Level 9 Civics.",
+    estimatedMinutes: 30,
+    year: 9,
+    subject: "history",
+    strand: "Civics",
+    content: [
+      { type: "paragraph", text: "Australia: constitutional monarchy, federation (6 states + 2 territories + Commonwealth). Constitution (1901) sets powers. Three levels: federal, state/territory, local. High Court interprets Constitution." },
+      { type: "list", items: ["Separation of powers: legislature, executive, judiciary", "Democratic values: freedom, equality, rule of law, fairness", "Referendum needed to change Constitution — double majority required", "Rights: implied (political communication) + statutory, no US-style bill of rights"] },
+    ],
+    quiz: [
+      { id: "q1", prompt: "Australia's system is:", options: ["Federation + constitutional monarchy", "Unitary republic", "Dictatorship", "No constitution"], correctIndex: 0, explanation: "Federation 1901." },
+      { id: "q2", prompt: "To change Constitution you need:", options: ["Referendum with double majority", "PM alone", "One state", "No process"], correctIndex: 0, explanation: "Majority nationally + majority states." },
+      { id: "q3", prompt: "Separation of powers prevents:", options: ["Concentration of power", "Voting", "Laws", "Courts"], correctIndex: 0, explanation: "Checks and balances." },
+      { id: "q4", prompt: "Which is federal responsibility?", options: ["Defence, immigration", "Local rubbish collection", "School curriculum only", "Parking fines only"], correctIndex: 0, explanation: "Commonwealth powers." },
+      { id: "q5", prompt: "High Court role:", options: ["Interprets Constitution, final appeal", "Makes all laws", "Runs schools", "Collects bins"], correctIndex: 0, explanation: "Judicial." },
+      { id: "q6", prompt: "Democratic value:", options: ["Rule of law", "Rule by one person", "No voting", "Censorship"], correctIndex: 0, explanation: "Core principle." },
+    ],
+  },
+  {
+    id: "y10-humanities-economics-vce-prep",
+    title: "Economics: Markets, Money & VCE Business Management Foundation",
+    summary: "35-min: supply/demand, inflation, RBA, VCE Units 1-2 prep.",
+    estimatedMinutes: 35,
+    year: 10,
+    subject: "history",
+    strand: "Economics · VCE Prep",
+    content: [
+      { type: "formula", latex: "\\text{Profit} = \\text{Revenue} - \\text{Costs}", note: "Business fundamentals" },
+      { type: "paragraph", text: "Economics studies scarcity and choices. Law of demand: price ↑, demand ↓. Law of supply: price ↑, supply ↑. Equilibrium where they meet. Inflation measured by CPI. RBA sets cash rate to manage inflation (2-3% target)." },
+      { type: "list", items: ["Micro: individual businesses/consumers", "Macro: whole economy (GDP, unemployment, inflation)", "VCE Business Management: management styles, HR, operations", "Budgeting, superannuation, tax — financial literacy"] },
+    ],
+    quiz: [
+      { id: "q1", prompt: "Law of demand:", options: ["Price up, demand down", "Price up, demand up", "No relationship", "Always equal"], correctIndex: 0, explanation: "Inverse." },
+      { id: "q2", prompt: "Equilibrium price is:", options: ["Where supply = demand", "Highest price", "Lowest price", "Government set only"], correctIndex: 0, explanation: "Market clearing." },
+      { id: "q3", prompt: "CPI measures:", options: ["Inflation / cost of living", "Temperature", "Population", "Distance"], correctIndex: 0, explanation: "Consumer Price Index." },
+      { id: "q4", prompt: "RBA raises cash rate to:", options: ["Reduce inflation", "Increase inflation", "No effect", "Print money"], correctIndex: 0, explanation: "Tightening." },
+      { id: "q5", prompt: "Profit formula:", options: ["Revenue - Costs", "Revenue + Costs", "Costs - Revenue", "Revenue × Costs"], correctIndex: 0, explanation: "Basic." },
+      { id: "q6", prompt: "GDP stands for:", options: ["Gross Domestic Product — total value produced", "General Debt Payment", "Global Data Price", "Gross Daily Profit"], correctIndex: 0, explanation: "Macro indicator." },
+    ],
+  },
+];
